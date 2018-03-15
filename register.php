@@ -4,7 +4,6 @@
   if(isset($_POST['submit'])){
 
     $err = array(
-      "err_occurred" => 0,
       "f_name" => "",
       "l_name" => "",
       "code_id" => "",
@@ -17,57 +16,155 @@
       "answer_3" => "",
       "email" => "",
     );
-    $illegal = "#$%^&*()+=[]';,./{}|:<>?~";
+    $special_char = "* Special character is not allowed.";
+    $please_insert_i = "* Please insert information.";
+    $illegal_e = "#$%^&*()+=[]';,./{}|:<>?~";
+    $illegal_n = "#$%^&*()+=[]';,./{}|:<>?~-_";
+    $illegal = "#$%^&*()+=[]';,./{}|:<>?~@";
 
     //First name check
     if(isset($_POST['name'])){
-      if(strpbrk($_POST['name'], $illegal)){
-        $err['f_name'] = "Special character is not allowed except \'-\' or \'_\'";
+      if(strpbrk($_POST['name'], $illegal_n)){
+        $err['f_name'] = $special_char;
+      }else{
+        $err['f_name'] = $please_insert_i;
       }
+    }else{
+      $err['f_name'] = $please_insert_i;
     }
 
     //Last name check
     if(isset($_POST['surname'])){
-      if(strpbrk($_POST['surname'], $illegal)){
-        $err['l_name'] = "Special character is not allowed except \'-\' or \'_\'";
-      }
-    }
-
-
-    //File check
-    $file = $_FILES['file'];
-    $filename = $file['name'];
-    $file_ext = strtolower(end(explode('.', $filename)));
-    $file_name_new = "";
-
-    $allowed = array('jpg', 'jpeg', 'png');
-    if(in_array($file_ext, $allowed)){
-      if($file['error'] === 0){
-        if($filw['size'] < 5000){
-          $newfilename = uniqid('', true).".".$file_ext;
-          $file_name_new = $newfilename;
-          $file_destination = 'uploads/'.$newfilename;
-          $sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name_new', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a')";
-          $conn->exec($sql_str);
-          move_uploaded_file($file['tmp_name'], $file_destination);
-        }else{
-          $err['copy-file'] = "Too much file size";
-        }
+      if(strpbrk($_POST['surname'], $illegal_n)){
+        $err['l_name'] = $special_char;
       }else{
-        $err['copy-file'] = "Error occured";
+        $err['l_name'] = $please_insert_i;
       }
     }else{
-      $err['copy-file'] = "File extension should be jpg, jpeg or png";
+      $err['l_name'] = $please_insert_i;
     }
 
 
+    //National ID or Passport ID check
+    if(isset($_POST['code-id'])){
+      if(!preg_match('/^[1-9][0-9]*$/', $_POST['code-id'])) {
+        $err['code_id'] = $special_char;
+      }else{
+        $err['code_id'] = $please_insert_i;
+      }
+    }else{
+      $err['code_id'] = $please_insert_i;
+    }
+
+    //File check
+    if(isset($_FILES['file']) && $_FILES['file']['name'] != null){
+      $file = $_FILES['file'];
+      $filename = $file['name'];
+      $file_ext = strtolower(end(explode('.', $filename)));
+      $file_name_new = "";
+
+      $allowed = array('jpg', 'jpeg', 'png');
+      if(in_array($file_ext, $allowed)){
+        if($file['error'] === 0){
+          if($filw['size'] < 5000){
+            $newfilename = uniqid('', true).".".$file_ext;
+            $file_name_new = $newfilename;
+            $file_destination = 'uploads/'.$newfilename;
+            //$sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name_new', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a')";
+            //$conn->exec($sql_str);
+           // move_uploaded_file($file['tmp_name'], $file_destination);
+            $err['copy_file'] = "Success";
+          }else{
+            $err['copy_file'] = "* Too much file size.";
+          }
+        }else{
+          $err['copy_file'] = "* Error occured.";
+        }
+      }else{
+        $err['copy_file'] = "* File extension should be jpg, jpeg or png.";
+      }
+    }else{
+      $err['copy_file'] = "* Please insert copy national id or passport id file.";
+    }
+
+
+    //Username check
+    if(isset($_POST['username'])){
+      if(strpbrk($_POST['username'], $illegal)){
+       $err['username'] = $special_char."except \"-\" or \"_\".";
+      }else{
+        $err['username'] = $please_insert_i;
+      }
+    }else{
+      $err['username'] = $please_insert_i;
+    }
+
+
+    //Password check
+    if(isset($_POST['password'])){
+      if(strpbrk($_POST['password'], $illegal)){
+       $err['password'] = $special_char."except \"-\" or \"_\".";
+      }else{
+        $err['password'] = $please_insert_i;
+      }
+    }else{
+      $err['password'] = $please_insert_i;
+    }
     
 
+
+    //Birth data check
+    if(isset($_POST['birth_date'])){
+      if(strpbrk($_POST['birth_date'], $illegal)){
+        $err['birth_date'] = "You birth date maybe wrong.";
+      }
+    }else{
+      $err['birth_date'] = "* Please insert date.";
+    }
+    
+
+    //Answer1 check
+    if(isset($_POST['answer_1'])){
+      if(strpbrk($_POST['answer_1'], $illegal)){
+        $err['answer_1'] = $special_char;
+      }
+    }else{
+      $err['answer_1'] = $please_insert_i;
+    }
+
+    //Answer2 check
+    if(isset($_POST['answer_2'])){
+      if(strpbrk($_POST['answer_2'], $illegal)){
+        $err['answer_2'] = $special_char;
+      }
+    }else{
+      $err['answer_2'] = $please_insert_i;
+    }
+
+
+    //Answer3 check
+    if(isset($_POST['answer_3'])){
+      if(strpbrk($_POST['answer_3'], $illegal)){
+        $err['answer_3'] = $special_char;
+      }
+    }else{
+      $err['answer_3'] = $please_insert_i;
+    }
+
+
+    //Email
+    if(isset($_POST['email'])){
+      if(strpbrk($_POST['email'], $illegal_e)){
+        $err['email'] = $special_char;
+      }
+    }else{
+      $err['email'] = $please_insert_i;
+    }
 
 
     $name = $_POST['name'];
     $surname = $_POST['surname'];
-    $n_id = $_POST['national-id'];
+    $n_id = $_POST['code-id'];
     $username = $_POST['username'];
     $password = $_POST['password'];
     $birth_date = $_POST['birth-date'];
@@ -80,12 +177,23 @@
     $second_a = $_POST['second-answer'];
     $third_a = $_POST['third-answer'];
 
-
-
-
-    
-
+    $email = $_POST['email'];
+  }else{
+    $err = array(
+      "f_name" => "",
+      "l_name" => "",
+      "code_id" => "",
+      "copy_file" => "",
+      "username" => "",
+      "password" => "",
+      "birth_date" => "",
+      "answer_1" => "",
+      "answer_2" => "",
+      "answer_3" => "",
+      "email" => "",
+    );
   }
+  print_r($err);
 
 ?>
 
@@ -94,7 +202,7 @@
 <head>
   <title>ธ.นำธรรมดี</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit"off">
   <link href="https://fonts.googleapis.com/css?family=Pattaya" rel="stylesheet">
   <link href="css/bootstrap-grid.css" rel="stylesheet">
   <link href="css/bootstrap-reboot.css" rel="stylesheet">
@@ -119,15 +227,20 @@
       </div>   
     </header>
 
-     <nav id="mainnav">
+    <nav id="mainnav">
       <div class="width">
           <ul>
-              <li><a href="index.php">Home</a></li>
-              <li><a href="news_form.php">News and Announcements</a></li>
+              <li class="dropdown">
+                  <button class="dropbtn"><a href="index.php">Home</a></button>
+                  <div class="dropdown-content">
+                      <a href="news1.html">News and   Announcement</a>
+
+                  </div>
+
+              </li>
               <li><a href="#">Knowledge sources</a></li>
               <li><a href="#">Events</a></li>
               <li><a href="#">About us</a></li>
-              <li><a href="#">Profile</a></li>
           </ul>
           <div class="clear"></div>
         <div class="clear"></div>
@@ -143,8 +256,12 @@
         <div class="row">
           <label for="name" style="margin-top: 5px;">First name</label>
           <div class="col">
-            <input type="text" class="form-control row" name="name" id="name" aria-describedby="name-help" autocomplete="no" required >
-            <small id="name-help" class="form-text text-muted row">Test text.</small>
+            <input type="text" class="form-control row" name="name" id="name" aria-describedby="name-help" autocomplete="off"  >
+            <small id="name-help" class="form-text row" style="color: red;">
+              <?php
+                echo $err['f_name'];
+              ?>
+            </small>
           </div>
         </div>
       </div>
@@ -154,8 +271,12 @@
         <div class="row">
           <label for="surname" style="margin-top: 5px;">Last name</label>
           <div class="col">
-            <input type="text" class="form-control row" name="surname" id="surname" aria-describedby="surname-help" autocomplete="no" required>
-           <small id="surname-help" class="form-text text-muted row">Test text.</small>
+            <input type="text" class="form-control row" name="surname" id="surname" aria-describedby="surname-help" autocomplete="off">
+           <small id="surname-help" class="form-text row" style="color: red;">
+             <?php
+              echo $err['l_name'];
+             ?>
+           </small>
          </div>
         </div>
       </div>
@@ -165,8 +286,12 @@
         <div class="row">
           <label for="code-id" style="margin-top: 0px;">National ID or <br> passport ID</label>
           <div class="col">
-            <input type="text" class="form-control row" name="code-id" id="code-id" aria-describedby="code-id-help" autocomplete="no" required>
-            <small id="code-id-help" class="form-text text-muted row">Test text.</small>
+            <input type="text" class="form-control row" name="code-id" id="code-id" aria-describedby="code-id-help" autocomplete="off">
+            <small id="code-id-help" style="color: red;" class="form-text row">
+              <?php
+                echo $err['code_id'];
+              ?>
+            </small>
           </div>
         </div>
       </div>
@@ -175,8 +300,12 @@
       <div class="form-group" style="margin-top: 10px;">
         <label for="file-upload">Copy national ID or passport ID file</label>
         <input type="file" name="file" class="form-control-file" id="file-upload" aria-describedby="upload-help"
-        required>
-        <small id="upload-help" class="form-text text-muted">Test text.</small>
+        >
+        <small id="upload-help" class="form-text" style="color: red;">
+          <?php
+            echo $err['copy_file'];
+          ?>
+        </small>
       </div>
 
 
@@ -185,8 +314,12 @@
         <div class="row">
           <label for="username" style="margin-top: 5px;">Username</label>
           <div class="col">
-            <input type="text" class="form-control row" name="username" id="username" aria-describedby="username-help" placeholder="username" required>
-            <small id="username-help" class="form-text text-muted row">Test text.</small>
+            <input type="text" class="form-control row" name="username" id="username" aria-describedby="username-help" placeholder="username" autocomplete="off" >
+            <small id="username-help" class="form-text row" style="color: red;">
+              <?php
+                echo $err['username'];
+              ?>
+            </small>
           </div>
         </div>
       </div>
@@ -197,18 +330,27 @@
         <div class="row">
           <label for="password" style="margin-top: 5px;">Password</label>
           <div class="col">
-            <input type="text" class="form-control row" name="password" id="password" aria-describedby="password-help" placeholder="password" pattern="[A-Za-z0-9]{5,16}" required>
-            <small id="password-help" class="form-text text-muted row">Test text.</small>
+            <input type="password" class="form-control row" name="password" id="password" aria-describedby="password-help" placeholder="password" autocomplete="off" >
+            <small id="password-help" class="form-text row" style="color: red">
+              <?php
+                echo $err['password'];
+              ?>
+            </small>
           </div>
         </div>
       </div>
 
+      <!-- Birth date -->
       <div class="form-group">
         <div class="row">
           <label for="birth-date" style="margin-top: 5px">Birth date</label>
           <div class="col">
-            <input type="date" class="form-control row" name="birth-date" id="birth-date" aria-describedby="birth-date-help" placeholder="birth date" required>
-            <small id="birth-date-help" class="form-text text-muted row">Test text.</small>
+            <input type="date" class="form-control row" name="birth-date" id="birth-date" aria-describedby="birth-date-help" placeholder="birth date" autocomplete="off" >
+            <small id="birth-date-help" class="form-text row" style="color: red;">
+              <?php
+                echo $err['birth_date'];
+              ?>
+            </small>
           </div>
         </div>
       </div>
@@ -229,9 +371,13 @@
         <!-- First answer -->
         <div class="col-6">
           <label for="first-answer">Answer</label>
-          <input type="text" class="form-control" name="first-answer" id="first-answer" autocomplete="no" required>
+          <input type="text" class="form-control" name="first-answer" id="first-answer" autocomplete="off" >
         </div>
-        <small id="first-question-answer-help" class="form-text text-muted">Test text.</small>
+        <small id="first-question-answer-help" class="form-text" style="color: red;">
+          <?php
+            echo $err['answer_1'];
+          ?>
+        </small>
       </div>
 
       <!-- Second question and answer -->
@@ -250,9 +396,13 @@
         <!-- Second answer -->
         <div class="col-6">
           <label for="second-answer">Answer</label>
-          <input type="text" class="form-control" name="second-answer" id="second-answer" autocomplete="no" required>
+          <input type="text" class="form-control" name="second-answer" id="second-answer" autocomplete="off" >
         </div>
-        <small id="second-question-answer-help" class="form-text text-muted">Test text.</small>
+        <small id="second-question-answer-help" class="form-text" style="color: red;">
+          <?php
+            echo $err['answer_2'];
+          ?>
+        </small>
       </div>
 
       <!-- Third question -->
@@ -271,9 +421,13 @@
         <!-- Third answer -->
         <div class="col-6">
           <label for="third-answer">Answer</label>
-          <input type="text" class="form-control" name="third-answer" id="birth-date" autocomplete="no" required>
+          <input type="text" class="form-control" name="third-answer" id="third-answer" autocomplete="off" >
         </div>
-        <small id="third-question-answer-help" class="form-text text-muted">Test text.</small>
+        <small id="third-question-answer-help" class="form-text" style="color: red;">
+          <?php
+            echo $err['answer_3'];
+          ?>
+        </small>
       </div>
 
       <!-- email -->
@@ -281,8 +435,12 @@
         <div class="row">
           <label for="email" style="margin-top: 5px;">Email</label>
           <div class="col">
-            <input type="text" class="form-control row" name="email" id="email" aria-describedby="email-help" autocomplete="no" required >
-            <small id="email-help" class="form-text text-muted row">Test text.</small>
+            <input type="email" class="form-control row" name="email" id="email" aria-describedby="email-help" autocomplete="off" >
+            <small id="email-help" style="color: red;" class="form-text row" >
+              <?php
+                echo $err['email'];
+              ?>
+            </small>
           </div>
         </div>
       </div>
@@ -291,7 +449,7 @@
 
       <center>
         <!-- Agreement -->
-        <input type="checkbox" name="accept-agreement" value="1" required> I agree <a href="#" style="text-decoration: none;">Policy<a>
+        <input type="checkbox" name="accept-agreement" value="1" required> I agree <a href="#" style="text-decoration:"offne;">Policy<a>
         <br><br>
         <button id="submit" class="btn btn-primary" name="submit">Register</button>
       </center>
@@ -305,10 +463,9 @@
     <div class="font-color1"> saharuthi_j@kkumail.com </div>
   </footer>
   <!-- Script -->
-  <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
   <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="offnymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="offnymous"></script>
   <script src='https://www.google.com/recaptcha/api.js'></script>
 </body>
 </html>

@@ -9,18 +9,18 @@
 
 		foreach($result as $news){
 			$string = $news['title'];
-	        if(strlen($string) > 140){
-	          $stringCut = substr($string, 0, 140);
+	        if(strlen($string) > 170){
+	          $stringCut = substr($string, 0, 170);
 	          $string = $stringCut.'...';
 	        }
-	        $timestamp = strtotime($news['date']);
+	        /*$timestamp = strtotime($news['date']);
                   $catdate = "&nbsp;&nbsp;&nbsp;&nbsp;".date('d', $timestamp)."-".date('m',$timestamp)."-".(int)(date('Y', $timestamp) + 543);
-                  $string .= $catdate;
+                  $string .= $catdate;*/
 	        $string = iconv("UTF-8", "UTF-8//IGNORE", $string);
-	        echo "<tr><td><a id=\"".$news['id']."\"href=\"news_form.php?id=".$news['id']."\" target=\"_blank\" class=\"font-color4\">". $string."</a></td></tr>";
+	        echo "<li><a id=\"".$news['id']."\"href=\"news_form.php?id=".$news['id']."\" target=\"_blank\" class=\"font-color4\">". $string."</a></li>";
 	     }
-	    if($last_id > 1){
-	    	echo "<tr>".$last_id;
+	    if($last_id >= 1){
+	    	echo "<li>".$last_id;
 	   	}
 	}
 ?>

@@ -52,12 +52,17 @@
      <nav id="mainnav">
       <div class="width">
           <ul>
-              <li><a href="index.php">Home</a></li>
-              <li class="selected-item" ><a href="news_form.php">News and Announcements</a></li>
+              <li class="dropdown">
+                  <button class="dropbtn"><a href="index.php">Home</a></button>
+                  <div class="dropdown-content">
+                      <a href="news1.html">News and Announcement</a>
+
+                  </div>
+
+              </li>
               <li><a href="#">Knowledge sources</a></li>
               <li><a href="#">Events</a></li>
               <li><a href="#">About us</a></li>
-              <li><a href="#">Profile</a></li>
           </ul>
           <div class="clear"></div>
         <div class="clear"></div>

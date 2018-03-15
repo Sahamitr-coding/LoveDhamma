@@ -34,20 +34,25 @@
 				
 		</header>
 
-     <nav id="mainnav">
+    <nav id="mainnav">
       <div class="width">
           <ul>
-              <li class="selected-item"><a href="index.php">Home</a></li>
-              <li><a href="news_form.php">News and Announcements</a></li>
+              <li class="dropdown">
+                  <button class="dropbtn"><a href="index.php">Home</a></button>
+                  <div class="dropdown-content">
+                      <a href="news1.html">News and Announcement</a>
+
+                  </div>
+
+              </li>
               <li><a href="#">Knowledge sources</a></li>
               <li><a href="#">Events</a></li>
               <li><a href="#">About us</a></li>
-              <li><a href="#">Profile</a></li>
           </ul>
           <div class="clear"></div>
         <div class="clear"></div>
       </div>
-    </nav> 
+    </nav>  
     <!-- end แก้ไข -->
     <section id="main-slider" class="navbar-body no-margin">
     <div id="myCarousel" class=" carousel slide " data-ride="carousel">
@@ -120,24 +125,22 @@
        <div style="max-width: 90%; margin: 0px auto;" class="alert" role="alert">
         <div class="col-sm-6 alert d-block p-2 backg-news font-color1 border-white">
         <p class="font-color3 font-Tri" > <MARQUEE behavior=alternate direction=left scrollAmount=3 width="4%"><font face=Webdings >4</font></MARQUEE><b>News &amp; Announcement</b><MARQUEE behavior=alternate direction=right scrollAmount=3 width="4%"><font face=Webdings>3</font></MARQUEE> </p>
-        <table class="table table-striped table-hover font-Tri">
-          <tbody class="get-data" id="list-data">
+          <ul class="get-data font-Tri text-left" id="list-data">
             <?php
               foreach ($result as $news) {
                 $string = $news['title'];
-                if(strlen($string) > 140){
-                  $stringCut = substr($string, 0, 140);
+                if(strlen($string) > 170){
+                  $stringCut = substr($string, 0, 170);
                   $string = $stringCut.'...';
                 }
-                 $timestamp = strtotime($news['date']);
+                 /*$timestamp = strtotime($news['date']);
                   $catdate = "&nbsp;&nbsp;&nbsp;&nbsp;".date('d', $timestamp)."-".date('m',$timestamp)."-".(int)(date('Y', $timestamp) + 543);
-                  $string .= $catdate;
+                  $string .= $catdate;*/
                 $string = iconv("UTF-8", "UTF-8//IGNORE", $string);
-                echo "<tr><td><a id=\"".$news['id']."\" href=\"news_form.php?id=".$news['id']."\" target=\"_blank\" class=\"font-color4\">". $string."</a></td></tr>";
+                echo "<li><a id=\"".$news['id']."\" href=\"news_form.php?id=".$news['id']."\" target=\"_blank\" class=\"font-color4\">". $string."</a></li>";
               }
             ?>
-          </tbody>
-          </table>
+          </ul>
             <div id="load-more" class="load_more text-right font-Tri" data-id=<?php echo end($get_result)['id'];?>> more...</div>         
       </div>
      </div>
@@ -189,10 +192,15 @@
         console.log(lastid);
         
         $.post("page.php",{lastId:lastid}, function(data){
-            current.closest("tr").remove();
-            $(".get-data").append(data);
-            str = data.split("<tr>");
-            if(str[str.length-1] > 1){
+            current.closest("li").remove();
+
+            str = data.split("<li>");
+            for(var i = 1; i < str.length - 1; i++){
+              str[i] = '<li>'+str[i];
+              $(".get-data").append(str[i]);
+            }
+            
+            if(str[str.length - 1] > 1){
               $('.load_more').attr('data-id', parseInt(str[str.length-1]));
             }else{
               $('.load_more').remove();
