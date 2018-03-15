@@ -50,16 +50,14 @@
           $sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name_new', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a')";
           $conn->exec($sql_str);
           move_uploaded_file($file['tmp_name'], $file_destination);
-          echo "<script><alert> Success </alert></script>";
-          header("Location: register.php?success");
         }else{
-          echo "<script><alert> Size too many </alert></script>";
+          $err['copy-file'] = "Too much file size";
         }
       }else{
-        echo "<script><alert> Error! </alert></script>";
+        $err['copy-file'] = "Error occured";
       }
     }else{
-      echo "<script><alert> Wrong file extension </alert><script>";
+      $err['copy-file'] = "File extension should be jpg, jpeg or png";
     }
 
 
