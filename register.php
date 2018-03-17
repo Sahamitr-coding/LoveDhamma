@@ -10,6 +10,7 @@
       "copy_file" => "",
       "username" => "",
       "password" => "",
+      "confirm_password" => "",
       "birth_date" => "",
       "answer_1" => "",
       "answer_2" => "",
@@ -112,6 +113,14 @@
       }
     }else{
       $err['password'] = $please_insert_i;
+    }
+
+    if(isset($_POST['password']) && isset($_POST['confirm-password']) && ($_POST['password'] !== $_POST['confirm-password'])){
+      $err['confirm_password'] = "Password doesn't match!.";
+    }else if($_POST['confirm-password'] == null){
+      $err['confirm_password'] = $please_insert_i;
+    }else{
+      $err['confirm_password'] = "";
     }
     
 
@@ -217,6 +226,7 @@
       "copy_file" => "",
       "username" => "",
       "password" => "",
+      "confirm_password" =>"",
       "birth_date" => "",
       "answer_1" => "",
       "answer_2" => "",
@@ -264,9 +274,7 @@
                   <button class="dropbtn"><a href="index.php">Home</a></button>
                   <div class="dropdown-content">
                       <a href="news1.html">News and   Announcement</a>
-
                   </div>
-
               </li>
               <li><a href="#">Knowledge sources</a></li>
               <li><a href="#">Events</a></li>
@@ -284,8 +292,10 @@
       <!-- First name -->
       <div class="form-group">
         <div class="row">
-          <label for="name" style="margin-top: 5px;">First name</label>
-          <div class="col">
+          <div class="col text-center">
+            <label for="name" style="margin-top: 5px;">First name :</label>
+          </div>
+          <div class="col-9">
             <input type="text" class="form-control row" name="name" id="name" aria-describedby="name-help" autocomplete="off"  >
             <small id="name-help" class="form-text row" style="color: red;">
               <?php
@@ -299,8 +309,10 @@
       <!-- Last name -->
       <div class="form-group">
         <div class="row">
-          <label for="surname" style="margin-top: 5px;">Last name</label>
-          <div class="col">
+          <div class="col text-center">
+            <label for="surname" style="margin-top: 5px;">Last name :</label>
+          </div>
+          <div class="col-9">
             <input type="text" class="form-control row" name="surname" id="surname" aria-describedby="surname-help" autocomplete="off">
            <small id="surname-help" class="form-text row" style="color: red;">
              <?php
@@ -314,8 +326,10 @@
       <!-- passport-id or national-id -->
       <div class="form-group">
         <div class="row">
-          <label for="code-id" style="margin-top: 0px;">National ID or <br> passport ID</label>
-          <div class="col">
+          <div class="col text-center">
+            <label for="code-id" style="margin-top: 0px;">National ID or<br>passport ID :</label>
+          </div>
+          <div class="col-9">
             <input type="text" class="form-control row" name="code-id" id="code-id" aria-describedby="code-id-help" autocomplete="off">
             <small id="code-id-help" style="color: red;" class="form-text row">
               <?php
@@ -327,8 +341,8 @@
       </div>
 
       <!-- Copy national-id or passport-id file -->
-      <div class="form-group" style="margin-top: 10px;">
-        <label for="file-upload">Copy national ID or passport ID file</label>
+      <div class="form-group" style="margin-top: 10px; margin-left: 1.5rem">
+        <label for="file-upload">Copy national ID or passport ID file :</label>
         <input type="file" name="file" class="form-control-file" id="file-upload" aria-describedby="upload-help"
         >
         <small id="upload-help" class="form-text" style="color: red;">
@@ -342,9 +356,11 @@
       <!-- username -->
       <div class="form-group">
         <div class="row">
-          <label for="username" style="margin-top: 5px;">Username</label>
-          <div class="col">
-            <input type="text" class="form-control row" name="username" id="username" aria-describedby="username-help" placeholder="username" autocomplete="off" >
+          <div class="col text-center">
+            <label for="username" style="margin-top: 5px;">Username :</label>
+          </div>
+          <div class="col-9">
+            <input type="text" class="form-control row" name="username" id="username" aria-describedby="username-help" autocomplete="off" >
             <small id="username-help" class="form-text row" style="color: red;">
               <?php
                 echo $err['username'];
@@ -358,9 +374,11 @@
       <!-- password -->
       <div class="form-group">
         <div class="row">
-          <label for="password" style="margin-top: 5px;">Password</label>
-          <div class="col">
-            <input type="password" class="form-control row" name="password" id="password" aria-describedby="password-help" placeholder="password" autocomplete="off" >
+          <div class="col text-center">
+            <label for="password" style="margin-top: 5px;">Password :</label>
+          </div>
+          <div class="col-9">
+            <input type="password" class="form-control row" name="password" id="password" aria-describedby="password-help" autocomplete="off" >
             <small id="password-help" class="form-text row" style="color: red">
               <?php
                 echo $err['password'];
@@ -370,11 +388,30 @@
         </div>
       </div>
 
+       <!-- Confirm password -->
+      <div class="form-group">
+        <div class="row">
+          <div class="col text-center">
+            <label for="confirm-password" style="margin-top: 5px;">Confirm password :</label>
+          </div>
+          <div class="col-9">
+            <input type="password" class="form-control row" name="confirm-password" id="password" aria-describedby="confirm-password-help" autocomplete="off" >
+            <small id="confirm-password-help" class="form-text row" style="color: red">
+              <?php
+                echo $err['confirm_password'];
+              ?>
+            </small>
+          </div>
+        </div>
+      </div>
+
       <!-- Birth date -->
       <div class="form-group">
         <div class="row">
-          <label for="birth-date" style="margin-top: 5px">Birth date</label>
-          <div class="col">
+          <div class="col text-center">
+            <label for="birth-date" style="margin-top: 5px">Birth date :</label>
+          </div>
+          <div class="col-9">
             <input type="date" class="form-control row" name="birth-date" id="birth-date" aria-describedby="birth-date-help" placeholder="birth date" autocomplete="off" >
             <small id="birth-date-help" class="form-text row" style="color: red;">
               <?php
@@ -463,8 +500,10 @@
       <!-- email -->
       <div class="form-group" style="margin-top: 20px;">
         <div class="row">
-          <label for="email" style="margin-top: 5px;">Email</label>
-          <div class="col">
+          <div class="col text-center">
+            <label for="email" style="margin-top: 5px;">Email :</label>
+          </div>
+          <div class="col-9">
             <input type="email" class="form-control row" name="email" id="email" aria-describedby="email-help" autocomplete="off" >
             <small id="email-help" style="color: red;" class="form-text row" >
               <?php

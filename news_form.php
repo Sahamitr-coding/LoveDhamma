@@ -70,7 +70,7 @@
     </nav> 
     <!-- end แก้ไข -->
     
-    <div class="container font-Tri" style="margin-top: 5rem; color: black;" >
+    <div class="container_baby font-Tri" style="margin-top: 5rem; color: black;" >
     	<h3 class="text-center " style="font-weight: bold;">
         <?php
           echo $result["title"];
@@ -88,7 +88,7 @@
     ?>  
     </p>
 		<br><br>
-		<div class="container row font-Tri" style="margin-top: 5rem">
+		<div class="container_baby row font-Tri" style="margin: 3rem 0;">
         <div class="previos-news text-left col">
           <?php
             if(isset($previous['title'])){
