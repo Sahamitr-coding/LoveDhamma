@@ -14,7 +14,7 @@
       "answer_1" => "",
       "answer_2" => "",
       "answer_3" => "",
-      "email" => "",
+      "e-email" => "",
     );
     $special_char = "* Special character is not allowed.";
     $please_insert_i = "* Please insert information.";
@@ -23,22 +23,23 @@
     $illegal = "#$%^&*()+=[]';,./{}|:<>?~@";
 
     //First name check
-    if(isset($_POST['name'])){
+    if(isset($_POST['name']) && $_POST['name']){
       if(strpbrk($_POST['name'], $illegal_n)){
         $err['f_name'] = $special_char;
       }else{
-        $err['f_name'] = $please_insert_i;
+          $err['f_name'] = "";
       }
     }else{
       $err['f_name'] = $please_insert_i;
     }
 
     //Last name check
-    if(isset($_POST['surname'])){
+    if(isset($_POST['surname']) && $_POST['surname']){
       if(strpbrk($_POST['surname'], $illegal_n)){
         $err['l_name'] = $special_char;
+
       }else{
-        $err['l_name'] = $please_insert_i;
+          $err['l_name'] ="";
       }
     }else{
       $err['l_name'] = $please_insert_i;
@@ -46,34 +47,37 @@
 
 
     //National ID or Passport ID check
-    if(isset($_POST['code-id'])){
-      if(!preg_match('/^[1-9][0-9]*$/', $_POST['code-id'])) {
-        $err['code_id'] = $special_char;
-      }else{
-        $err['code_id'] = $please_insert_i;
-      }
+    if(isset($_POST['code-id']) && $_POST['code-id']){
+        if(!preg_match('/^[1-9][0-9]*$/', $_POST['code-id'])) {
+           $err['code_id'] = $special_char;
+        }else{
+          $err['code-id'] = "";
+        }
     }else{
       $err['code_id'] = $please_insert_i;
+
     }
+
 
     //File check
     if(isset($_FILES['file']) && $_FILES['file']['name'] != null){
       $file = $_FILES['file'];
       $filename = $file['name'];
-      $file_ext = strtolower(end(explode('.', $filename)));
+      if ($filename != null)
+        $file_ext = strtolower(end(explode('.', $filename)));
       $file_name_new = "";
 
       $allowed = array('jpg', 'jpeg', 'png');
       if(in_array($file_ext, $allowed)){
         if($file['error'] === 0){
-          if($filw['size'] < 5000){
+          if($file['size'] < 5000){
             $newfilename = uniqid('', true).".".$file_ext;
             $file_name_new = $newfilename;
             $file_destination = 'uploads/'.$newfilename;
             //$sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name_new', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a')";
             //$conn->exec($sql_str);
            // move_uploaded_file($file['tmp_name'], $file_destination);
-            $err['copy_file'] = "Success";
+            $err['copy_file'] = "";
           }else{
             $err['copy_file'] = "* Too much file size.";
           }
@@ -89,11 +93,11 @@
 
 
     //Username check
-    if(isset($_POST['username'])){
+    if(isset($_POST['username']) && $_POST['username']){
       if(strpbrk($_POST['username'], $illegal)){
        $err['username'] = $special_char."except \"-\" or \"_\".";
       }else{
-        $err['username'] = $please_insert_i;
+        $err['username'] = "";
       }
     }else{
       $err['username'] = $please_insert_i;
@@ -101,11 +105,11 @@
 
 
     //Password check
-    if(isset($_POST['password'])){
+    if(isset($_POST['password']) && $_POST['password']){
       if(strpbrk($_POST['password'], $illegal)){
        $err['password'] = $special_char."except \"-\" or \"_\".";
       }else{
-        $err['password'] = $please_insert_i;
+        $err['password'] = "";
       }
     }else{
       $err['password'] = $please_insert_i;
@@ -124,18 +128,22 @@
     
 
     //Answer1 check
-    if(isset($_POST['answer_1'])){
+    if(isset($_POST['answer_1']) && $_POST['answer_1']){
       if(strpbrk($_POST['answer_1'], $illegal)){
         $err['answer_1'] = $special_char;
+      }else{
+        $err['answer_1'] = "";
       }
     }else{
       $err['answer_1'] = $please_insert_i;
     }
 
     //Answer2 check
-    if(isset($_POST['answer_2'])){
+    if(isset($_POST['answer_2']) && $_POST['answer_2']){
       if(strpbrk($_POST['answer_2'], $illegal)){
         $err['answer_2'] = $special_char;
+      }else{
+        $err['answer_2'] = "";
       }
     }else{
       $err['answer_2'] = $please_insert_i;
@@ -143,9 +151,11 @@
 
 
     //Answer3 check
-    if(isset($_POST['answer_3'])){
+    if(isset($_POST['answer_3']) && $_POST['answer_3']){
       if(strpbrk($_POST['answer_3'], $illegal)){
         $err['answer_3'] = $special_char;
+      }else{
+        $err['answer_3'] ="";
       }
     }else{
       $err['answer_3'] = $please_insert_i;
@@ -153,12 +163,14 @@
 
 
     //Email
-    if(isset($_POST['email'])){
+    if(isset($_POST['email']) && $_POST['email']){
       if(strpbrk($_POST['email'], $illegal_e)){
-        $err['email'] = $special_char;
+        $err['e-email'] = $special_char;
+      }else{
+          $err['e-email'] ="";
       }
     }else{
-      $err['email'] = $please_insert_i;
+      $err['e-email'] = $please_insert_i;
     }
 
 
@@ -190,11 +202,10 @@
       "answer_1" => "",
       "answer_2" => "",
       "answer_3" => "",
-      "email" => "",
+      "e-email" => "",
     );
   }
-  print_r($err);
-
+  //print_r($err);
 ?>
 
 <!DOCTYPE html>
@@ -247,7 +258,7 @@
       </div>
     </nav> 
   <div class="register_container">
-    <h3 style="text-align: center; margin-top: 2rem;">สมัครสมาชิก</h3><br><br>
+    <h3 style="text-align: center; margin-top: 2rem;">Registration</h3><br><br>
 
     <form id="register_form" class="font-Tri" method="post" enctype="multipart/form-data">
 
@@ -438,7 +449,7 @@
             <input type="email" class="form-control row" name="email" id="email" aria-describedby="email-help" autocomplete="off" >
             <small id="email-help" style="color: red;" class="form-text row" >
               <?php
-                echo $err['email'];
+                echo $err['e-email'];
               ?>
             </small>
           </div>
