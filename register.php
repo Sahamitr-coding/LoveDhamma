@@ -18,12 +18,12 @@
     );
     $special_char = "* Special character is not allowed.";
     $please_insert_i = "* Please insert information.";
-    $illegal_e = "#$%^&*()+=[]';,./{}|:<>?~";
+    $illegal_e = "#$%^&*()+=[]';,/{}|:<>?~";
     $illegal_n = "#$%^&*()+=[]';,./{}|:<>?~-_";
     $illegal = "#$%^&*()+=[]';,./{}|:<>?~@";
 
     //First name check
-    if(isset($_POST['name']) && $_POST['name']){
+    if(isset($_POST['name']) && $_POST['name'] != null){
       if(strpbrk($_POST['name'], $illegal_n)){
         $err['f_name'] = $special_char;
       }else{
@@ -34,7 +34,7 @@
     }
 
     //Last name check
-    if(isset($_POST['surname']) && $_POST['surname']){
+    if(isset($_POST['surname']) && $_POST['surname'] != null){
       if(strpbrk($_POST['surname'], $illegal_n)){
         $err['l_name'] = $special_char;
 
@@ -47,7 +47,7 @@
 
 
     //National ID or Passport ID check
-    if(isset($_POST['code-id']) && $_POST['code-id']){
+    if(isset($_POST['code-id']) && $_POST['code-id'] != null){
         if(!preg_match('/^[1-9][0-9]*$/', $_POST['code-id'])) {
            $err['code_id'] = $special_char;
         }else{
@@ -63,20 +63,19 @@
     if(isset($_FILES['file']) && $_FILES['file']['name'] != null){
       $file = $_FILES['file'];
       $filename = $file['name'];
-      if ($filename != null)
-        $file_ext = strtolower(end(explode('.', $filename)));
+      $explode = explode('.', $filename);
+      if ($explode != null){
+        $file_ext = strtolower(end($explode));
+      }
       $file_name_new = "";
 
       $allowed = array('jpg', 'jpeg', 'png');
       if(in_array($file_ext, $allowed)){
         if($file['error'] === 0){
-          if($file['size'] < 5000){
+          if($file['size'] < 5000000){
             $newfilename = uniqid('', true).".".$file_ext;
             $file_name_new = $newfilename;
             $file_destination = 'uploads/'.$newfilename;
-            //$sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name_new', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a')";
-            //$conn->exec($sql_str);
-           // move_uploaded_file($file['tmp_name'], $file_destination);
             $err['copy_file'] = "";
           }else{
             $err['copy_file'] = "* Too much file size.";
@@ -93,7 +92,7 @@
 
 
     //Username check
-    if(isset($_POST['username']) && $_POST['username']){
+    if(isset($_POST['username']) && $_POST['username'] != null){
       if(strpbrk($_POST['username'], $illegal)){
        $err['username'] = $special_char."except \"-\" or \"_\".";
       }else{
@@ -105,7 +104,7 @@
 
 
     //Password check
-    if(isset($_POST['password']) && $_POST['password']){
+    if(isset($_POST['password']) && $_POST['password'] != null){
       if(strpbrk($_POST['password'], $illegal)){
        $err['password'] = $special_char."except \"-\" or \"_\".";
       }else{
@@ -118,8 +117,8 @@
 
 
     //Birth data check
-    if(isset($_POST['birth_date'])){
-      if(strpbrk($_POST['birth_date'], $illegal)){
+    if(isset($_POST['birth-date']) && $_POST['birth-date'] != NULL){
+      if(strpbrk($_POST['birth-date'], $illegal)){
         $err['birth_date'] = "You birth date maybe wrong.";
       }
     }else{
@@ -128,8 +127,8 @@
     
 
     //Answer1 check
-    if(isset($_POST['answer_1']) && $_POST['answer_1']){
-      if(strpbrk($_POST['answer_1'], $illegal)){
+    if(isset($_POST['first-answer']) && $_POST['first-answer'] != null){
+      if(strpbrk($_POST['first-answer'], $illegal)){
         $err['answer_1'] = $special_char;
       }else{
         $err['answer_1'] = "";
@@ -139,8 +138,8 @@
     }
 
     //Answer2 check
-    if(isset($_POST['answer_2']) && $_POST['answer_2']){
-      if(strpbrk($_POST['answer_2'], $illegal)){
+    if(isset($_POST['second-answer']) && $_POST['second-answer'] != null){
+      if(strpbrk($_POST['second-answer'], $illegal)){
         $err['answer_2'] = $special_char;
       }else{
         $err['answer_2'] = "";
@@ -151,8 +150,8 @@
 
 
     //Answer3 check
-    if(isset($_POST['answer_3']) && $_POST['answer_3']){
-      if(strpbrk($_POST['answer_3'], $illegal)){
+    if(isset($_POST['third-answer']) && $_POST['third-answer'] != null){
+      if(strpbrk($_POST['third-answer'], $illegal)){
         $err['answer_3'] = $special_char;
       }else{
         $err['answer_3'] ="";
@@ -163,7 +162,7 @@
 
 
     //Email
-    if(isset($_POST['email']) && $_POST['email']){
+    if(isset($_POST['email']) && $_POST['email'] != null){
       if(strpbrk($_POST['email'], $illegal_e)){
         $err['e-email'] = $special_char;
       }else{
@@ -173,7 +172,12 @@
       $err['e-email'] = $please_insert_i;
     }
 
-
+    $i = 0;
+    foreach ($err as $key => $value) {
+      if($value != ""){
+        $i++;
+      }
+    }
     $name = $_POST['name'];
     $surname = $_POST['surname'];
     $n_id = $_POST['code-id'];
@@ -190,6 +194,21 @@
     $third_a = $_POST['third-answer'];
 
     $email = $_POST['email'];
+    if(!$i){
+      $subject = "Test send email";
+      $header = "From: wasitthaphon@gmail.com";
+      $message = "My Body & My Desctription";
+      $flag = @mail($email, $subject, $message, $header);
+      if($flag){
+        $sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name_new', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a', '$email', 0, 0)";
+        $conn->exec($sql_str);
+        move_uploaded_file($file['tmp_name'], $file_destination);
+        header("Location: success.php");
+      }else{
+        echo "email can not send.";
+      }
+    }
+
   }else{
     $err = array(
       "f_name" => "",
