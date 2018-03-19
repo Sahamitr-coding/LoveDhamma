@@ -1,11 +1,11 @@
 <?php
-	$servername = "localhost";
-	$username = "root";
-	$password = "";
+	//$servername = "localhost";
+	//$username = "root";
+	//$password = "";
 	
-	//$servername = "10.66.199.227";
-	//$username = "Sec02_Saha";
-	//$password = H4s7cm39";
+	$servername = "10.66.199.227";
+	$username = "Sec02_Saha";
+	$password = "H4s7cm39";
 
 
 	try {
