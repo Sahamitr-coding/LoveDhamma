@@ -21,7 +21,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ธ.นำธรรมดี</title>
+  <title>ชุมชน คนชอบปฏิบัติธรรม</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link href="css/main.css" rel="stylesheet">
@@ -39,30 +39,30 @@
   <main role="main">
    <!-- แก้ไข -->
 <header class="header_Bg">
-			<div class="navbar-header width">
+      <div class="navbar-header width">
         <img class="img left" src="img/Logo1.png" alt="Logo1">
         <spen class="right">
             <div><a class="btn-link" href="#">Sign In</a></div>
             <div><a class="btn-link" href="register.php">Register</a></div>
         </spen>
-			</div>
-				
-		</header>
+      </div>
+        
+    </header>
 
      <nav id="mainnav">
       <div class="width">
           <ul>
               <li class="dropdown">
-                  <button class="dropbtn"><a href="index.php">Home</a></button>
+                  <button class="dropbtn2" id="home"><a href="index.php">Home</a></button>
                   <div class="dropdown-content">
-                      <a href="news1.html">News and Announcement</a>
+                      <a class="dropbtn" href="news_form.php">News and Announcement</a>
 
                   </div>
 
               </li>
-              <li><a href="#">Knowledge sources</a></li>
-              <li><a href="#">Events</a></li>
-              <li><a href="#">About us</a></li>
+              <li><a class="dropbtn2" href="#">Knowledge sources</a></li>
+              <li><a class="dropbtn2" href="#">Events</a></li>
+              <li><a class="dropbtn2" href="#">About us</a></li>
           </ul>
           <div class="clear"></div>
         <div class="clear"></div>
@@ -107,7 +107,7 @@
     </div>
 
     <footer id="footer" class="text-center">
-     <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน ธ.นำธรรมดี </span> </div>
+     <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน คนชอบปฏิบัติธรรม</span> </div>
      <div class="font-color1"> saharuthi_j@kkumail.com </div>       
     </footer>
     <!-- Script -->

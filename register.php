@@ -1,6 +1,6 @@
-
 <?php
   require('connect.php');
+
   if(isset($_POST['submit'])){
 
     $err = array(
@@ -17,48 +17,80 @@
       "answer_3" => "",
       "e-email" => "",
     );
+
     $special_char = "* Special character is not allowed.";
     $please_insert_i = "* Please insert information.";
-    $illegal_e = "#$%^&*()+=[]';,/{}|:<>?~";
-    $illegal_n = "#$%^&*()+=[]';,./{}|:<>?~-_";
-    $illegal = "#$%^&*()+=[]';,./{}|:<>?~@";
+    $illegal_e = "#$%^&*()+=[]';,/{}|:<>?~ ";
+    $illegal_no_need_num = "#$%^&*()+=[]';,./{}|:<>?~@ 0123456789๐๑๒๓๔๕๖๗๘๙";
+    $illegal_password = "#$%^&*()+=[]';,./{}|:<>?~@ ";
+    $illegal_answer = "#$%^&*()+=[]';,./{}|:<>?~@";
 
-    //First name check
-    if(isset($_POST['name']) && $_POST['name'] != null){
-      if(strpbrk($_POST['name'], $illegal_n)){
-        $err['f_name'] = $special_char;
+    //Check firstname and lastname in database.
+    if(isset($_POST['name']) && isset($_POST['surname'])){
+      $sql = 'SELECT id FROM user WHERE name = "$_POST[name]" AND surname = "$_POST[surname]"';
+      $result = ($conn->query($sql))->fetch();
+
+      //Check firstname and lastname in database.
+      if($result){
+        $err['f_name'] = "* This first name already exist.";
+        $err['l_name'] = "* This last name already exist.";
       }else{
-          $err['f_name'] = "";
+
+        //Firstname check
+        if(isset($_POST['name']) && $_POST['name'] != null){
+          if(strpbrk($_POST['name'], $illegal_no_need_num)){
+            $err['f_name'] = $special_char;
+          }else{
+              $err['f_name'] = "";
+          }
+        }else{
+          $err['f_name'] = $please_insert_i;
+        }
+
+        //Lastname check
+        if(isset($_POST['surname']) && $_POST['surname'] != null){
+          if(strpbrk($_POST['surname'], $illegal_no_need_num)){
+            $err['l_name'] = $special_char;
+          }else{
+              $err['l_name'] ="";     
+          }
+        }else{
+          $err['l_name'] = $please_insert_i;
+        }
       }
     }else{
       $err['f_name'] = $please_insert_i;
-    }
-
-    //Last name check
-    if(isset($_POST['surname']) && $_POST['surname'] != null){
-      if(strpbrk($_POST['surname'], $illegal_n)){
-        $err['l_name'] = $special_char;
-
-      }else{
-          $err['l_name'] ="";
-      }
-    }else{
       $err['l_name'] = $please_insert_i;
     }
 
+    //National ID check and Passport ID
+    if(isset($_POST['code-id'])){
+      $sql = 'SELECT id FROM user WHERE national_id = "$_POST[code-id]"';
+      $id_result = ($conn->query($sql))->fetch();
 
-    //National ID or Passport ID check
-    if(isset($_POST['code-id']) && $_POST['code-id'] != null){
-        if(!preg_match('/^[1-9][0-9]*$/', $_POST['code-id'])) {
-           $err['code_id'] = $special_char;
+      if($id_result){
+        $err['code_id'] = "* This national ID or passport ID already exist.";
+      }else{  
+        if(strlen($_POST['code-id']) == 13 || strlen($_POST['code-id']) == 9){
+          if(strlen($_POST['code-id']) == 13){  //National ID
+            for($j = 0, $sum = 0; $j < 12; $j++){
+              $sum += (int)($_POST['code-id']{$j})*(13-$j);
+              if((11 - ($sum % 11)) % 10 == (int)($_POST['code-id']{12})){
+                $err['code_id'] = "";
+              }else{
+                $err['code_id'] = "* Invalid National ID or Passport ID format.";
+              }
+            }
+          }else if(strlen($_POST['code-id']) == 9 && !preg_match('/[a-zA-Z]{2}[0-9]{7}/', $_POST['code-id'])){  //Passport ID
+            $err['code_id'] = "";
+          }
         }else{
-          $err['code-id'] = "";
+          $err['code_id'] = "* Invalid National ID or Passport ID format.";
         }
+      }
     }else{
       $err['code_id'] = $please_insert_i;
-
     }
-
 
     //File check
     if(isset($_FILES['file']) && $_FILES['file']['name'] != null){
@@ -94,22 +126,30 @@
 
     //Username check
     if(isset($_POST['username']) && $_POST['username'] != null){
-      if(strpbrk($_POST['username'], $illegal)){
-       $err['username'] = $special_char."except \"-\" or \"_\".";
+      $sql = 'SELECT id FROM user WHERE username = "$_POST[username]"';
+      $username_result = ($conn->query($sql))->fetch();
+
+      if($username_result){
+        $err['username'] = "* This username already exist.";
       }else{
-        $err['username'] = "";
+        if(strpbrk($_POST['username'], $illegal_password)){
+          $err['username'] = $special_char."except \"-\" or \"_\".";
+        }else{
+          $err['username'] = "";
+        }
       }
     }else{
       $err['username'] = $please_insert_i;
     }
 
-
     //Password check
     if(isset($_POST['password']) && $_POST['password'] != null){
-      if(strpbrk($_POST['password'], $illegal)){
-       $err['password'] = $special_char."except \"-\" or \"_\".";
+      if(strpbrk($_POST['password'], $illegal_password)){
+        $err['password'] = $special_char."except \"-\" or \"_\".";
+      }else if(strlen($_POST['password']) < 16){
+        $err['password'] = "* Password length must more than 15 characters.";
       }else{
-        $err['password'] = "";
+        $err['password'] ="";
       }
     }else{
       $err['password'] = $please_insert_i;
@@ -122,13 +162,21 @@
     }else{
       $err['confirm_password'] = "";
     }
-    
-
-
+  
     //Birth data check
     if(isset($_POST['birth-date']) && $_POST['birth-date'] != NULL){
-      if(strpbrk($_POST['birth-date'], $illegal)){
+      if(strpbrk($_POST['birth-date'], $illegal_e)){
         $err['birth_date'] = "You birth date maybe wrong.";
+      }else{
+        $date_now = strtotime("now");
+        $date_user = strtotime($_POST['birth-date']);
+        $date_should_less_or_equal_than = strtotime("-15 years", $date_now);
+
+        if($date_user > $date_should_less_or_equal_than){
+          $err['birth_date'] = "* You must be 15 years of age or older.";
+        }else{
+          $err['birth_date'] ="";
+        }
       }
     }else{
       $err['birth_date'] = "* Please insert date.";
@@ -137,7 +185,7 @@
 
     //Answer1 check
     if(isset($_POST['first-answer']) && $_POST['first-answer'] != null){
-      if(strpbrk($_POST['first-answer'], $illegal)){
+      if(strpbrk($_POST['first-answer'], $illegal_answer)){
         $err['answer_1'] = $special_char;
       }else{
         $err['answer_1'] = "";
@@ -148,7 +196,7 @@
 
     //Answer2 check
     if(isset($_POST['second-answer']) && $_POST['second-answer'] != null){
-      if(strpbrk($_POST['second-answer'], $illegal)){
+      if(strpbrk($_POST['second-answer'], $illegal_answer)){
         $err['answer_2'] = $special_char;
       }else{
         $err['answer_2'] = "";
@@ -160,7 +208,7 @@
 
     //Answer3 check
     if(isset($_POST['third-answer']) && $_POST['third-answer'] != null){
-      if(strpbrk($_POST['third-answer'], $illegal)){
+      if(strpbrk($_POST['third-answer'], $illegal_answer)){
         $err['answer_3'] = $special_char;
       }else{
         $err['answer_3'] ="";
@@ -169,13 +217,23 @@
       $err['answer_3'] = $please_insert_i;
     }
 
-
     //Email
     if(isset($_POST['email']) && $_POST['email'] != null){
-      if(strpbrk($_POST['email'], $illegal_e)){
-        $err['e-email'] = $special_char;
+      $sql = 'SELECT id FROM user WHERE email = "$_POST[email]"';
+      $email_result = ($conn->query($sql))->fetch();
+
+      if($email_result){
+        $err['e-email'] = "* This email already exist.";
       }else{
-          $err['e-email'] ="";
+        if(strpbrk($_POST['email'], $illegal_e)){
+          $err['e-email'] = $special_char;
+        }else{
+          if(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)){
+              $err['e-email'] = "* Invalid email format."; 
+          }else{
+            $err['e-email'] ="";
+          }
+        }
       }
     }else{
       $err['e-email'] = $please_insert_i;
@@ -187,6 +245,7 @@
         $i++;
       }
     }
+
     $name = $_POST['name'];
     $surname = $_POST['surname'];
     $n_id = $_POST['code-id'];
@@ -203,22 +262,26 @@
     $third_a = $_POST['third-answer'];
 
     $email = $_POST['email'];
+
     if(!$i){
+      $to = $email;
       $subject = "Test send email";
-      $header = "From: wasitthaphon@gmail.com";
       $message = "My Body & My Desctription";
-      $flag = @mail($email, $subject, $message, $header);
-      if($flag){
+      $header = "From: wasitthaphon@gmail.com"." \r\n".
+                "Reply-To: wasitthaphon@gmail.com"." \r\n".
+                "X-Mailer: PHP/".phpversion();
+      $flag = @mail($to, $subject, $message, $header);
+
+      //Dont forget to set flag!
+      if(true){
         $sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name_new', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a', '$email', 0, 0)";
         $conn->exec($sql_str);
         move_uploaded_file($file['tmp_name'], $file_destination);
-        header("Location: success.php");
-      }else{
-        echo "email can not send.";
+        header("Location: Successful.html");
       }
     }
 
-  }else{
+  }else{      //No POST action occure.
     $err = array(
       "f_name" => "",
       "l_name" => "",
@@ -240,50 +303,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ธ.นำธรรมดี</title>
+<title>ชุมชน คนชอบปฏิบัติธรรม</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit"off">
-  <link href="https://fonts.googleapis.com/css?family=Pattaya" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="css/main.css" rel="stylesheet">
   <link href="css/bootstrap-grid.css" rel="stylesheet">
   <link href="css/bootstrap-reboot.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Pattaya" rel="stylesheet">
   <link rel="stylesheet" href="css/reset.css" type="text/css" />
   <link rel="stylesheet" href="css/styles.css" type="text/css" />
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-  <link href="css/main.css" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="css/carousel.css">
-      <!-- เพิ่ม --> <link href="https://fonts.googleapis.com/css?family=Maitree|Trirong" rel="stylesheet">
+  <link href="css/carousel.css" rel="stylesheet" type="text/css" >
+        <!-- เพิ่ม --> <link href="https://fonts.googleapis.com/css?family=Maitree|Trirong" rel="stylesheet">
 </head>
 <body class="Backg-body">
 
   <main role="main">
    <!-- แก้ไข -->
-    <header class="header_Bg">
+<header class="header_Bg">
       <div class="navbar-header width">
         <img class="img left" src="img/Logo1.png" alt="Logo1">
         <spen class="right">
             <div><a class="btn-link" href="#">Sign In</a></div>
             <div><a class="btn-link" href="register.php">Register</a></div>
         </spen>
-      </div>   
+      </div>
+        
     </header>
 
-    <nav id="mainnav">
+     <nav id="mainnav">
       <div class="width">
           <ul>
               <li class="dropdown">
-                  <button class="dropbtn"><a href="index.php">Home</a></button>
+                  <button class="dropbtn2"><a href="index.php">Home</a></button>
                   <div class="dropdown-content">
-                      <a href="news1.html">News and   Announcement</a>
+                      <a href="news1.html">News and Announcement</a>
+
                   </div>
+
               </li>
-              <li><a href="#">Knowledge sources</a></li>
-              <li><a href="#">Events</a></li>
-              <li><a href="#">About us</a></li>
+              <li><a class="dropbtn2" href="#">Knowledge sources</a></li>
+              <li><a class="dropbtn2" href="#">Events</a></li>
+              <li><a class="dropbtn2" href="#">About us</a></li>
           </ul>
           <div class="clear"></div>
         <div class="clear"></div>
       </div>
     </nav> 
+    <!-- end แก้ไข -->
+
+
   <div class="register_container">
     <h3 style="text-align: center; margin-top: 2rem;">Registration</h3><br><br>
 
@@ -342,14 +411,16 @@
 
       <!-- Copy national-id or passport-id file -->
       <div class="form-group" style="margin-top: 10px; margin-left: 1.5rem">
-        <label for="file-upload">Copy national ID or passport ID file :</label>
-        <input type="file" name="file" class="form-control-file" id="file-upload" aria-describedby="upload-help"
-        >
-        <small id="upload-help" class="form-text" style="color: red;">
-          <?php
-            echo $err['copy_file'];
-          ?>
-        </small>
+        <div class="row">
+          <label for="file-upload">Copy national ID or passport ID file :</label>
+          <input type="file" name="file" class="form-control-file" id="file-upload" aria-describedby="upload-help"
+          >
+          <small id="upload-help" class="form-text" style="color: red;">
+            <?php
+              echo $err['copy_file'];
+            ?>
+          </small>
+        </div>
       </div>
 
 
@@ -379,7 +450,7 @@
           </div>
           <div class="col-9">
             <input type="password" class="form-control row" name="password" id="password" aria-describedby="password-help" autocomplete="off" >
-            <small id="password-help" class="form-text row" style="color: red">
+            <small id="password-help" class="form-text row" style="color: red;">
               <?php
                 echo $err['password'];
               ?>
@@ -395,8 +466,8 @@
             <label for="confirm-password" style="margin-top: 5px;">Confirm password :</label>
           </div>
           <div class="col-9">
-            <input type="password" class="form-control row" name="confirm-password" id="password" aria-describedby="confirm-password-help" autocomplete="off" >
-            <small id="confirm-password-help" class="form-text row" style="color: red">
+            <input type="password" class="form-control row" name="confirm-password" id="confirm-password" aria-describedby="confirm-password-help" autocomplete="off" >
+            <small id="confirm-password-help" class="form-text row" style="color: red;">
               <?php
                 echo $err['confirm_password'];
               ?>
@@ -426,12 +497,14 @@
       <div class="form-row form-group">
         <div class="col-6">
           <label for="first-question">Please select one question</label>
-          <select class="custom-select" name="first-question">
+          <select class="custom-select" id="first-question" name="first-question">
 
             <!-- insert question here -->
-            <option selected value="1">ฮีโร่สุดโปรดของคุณชื่ออะไร</option>
-            <option value="2">เพื่อบ้านคนแรกของคุณชื่ออะไร</option>
-
+            <option selected value="1">What is the name of your pet?</option>
+            <option value="2">What is the name of your pet?</option>
+            <option value="3">What is your best friend’s name?</option>
+            <option value="4">What is your favorite song?</option>
+            <option value="5">What is your favorite singer?</option>
           </select>
         </div>
 
@@ -451,11 +524,14 @@
       <div class="form-row form-group">
         <div class="col-6">
           <label for="second-question">Please select one question</label>
-          <select class="custom-select" name="second-question">
+          <select class="custom-select" id="second-question" name="second-question">
 
             <!-- insert question here -->
-            <option selected value="1">ฮีโร่สุดโปรดของคุณชื่ออะไร</option>
-            <option value="2">เพื่อบ้านคนแรกของคุณชื่ออะไร</option>
+            <option selected value="6">What is your favorite movie?</option>
+            <option value="7">What is your favorite super hero?</option>
+            <option value="8">What is your dream career?</option>
+            <option value="9">What is your hometown?</option>
+            <option value="10">What is your high school’s name?</option>
 
           </select>
         </div>
@@ -476,11 +552,14 @@
       <div class="form-row form-group">
         <div class="col-6">
           <label for="third-question">Please select one question</label>
-          <select class="custom-select" name="third-question">
+          <select class="custom-select" id="third-question" name="third-question">
 
             <!-- insert question here -->
-            <option selected value="1">ฮีโร่สุดโปรดของคุณชื่ออะไร</option>
-            <option value="2">เพื่อบ้านคนแรกของคุณชื่ออะไร</option>
+            <option selected value="11">What is your favorite brand?</option>
+            <option value="12">What is your favorite sport?</option>
+            <option value="13">What is your favorite hobby?</option>
+            <option value="14">What is your favorite season?</option>
+            <option value="15">What is your favorite subject?</option>
 
           </select>
         </div>
@@ -518,17 +597,33 @@
 
       <center>
         <!-- Agreement -->
-        <input type="checkbox" name="accept-agreement" value="1" required> I agree <a href="#" style="text-decoration:"offne;">Policy<a>
+        <input type="checkbox" name="accept-agreement" value="1" id="accept-agreement" required> I agree <a href="#openModal" style="text-decoration:"offne;">agreement.<a>
         <br><br>
         <button id="submit" class="btn btn-primary" name="submit">Register</button>
       </center>
     </form>
   </div>
 
-
+  <div id="openModal" class="modalDialog">
+    <div>
+      <a href="#close" title="Close" class="close_modal">X</a>
+      <h2>Agreement</h2>
+         <p>Policy of Dharma initiative lovers</p>
+          <p>&nbsp;&nbsp;&nbsp;This forum is established for people who interested in Dharma. Registration to this forum is free. We do insist that you abide by the rules and policy detailed below. I you agree to the terms, please check ‘I agree’ box below. If you would like to cancel the registration, click cancel to return to the forums index.</p>
+      <ol>
+        <li>Do not post any massage, content and news that against or allusion royal family, prophet and religion.</li>
+        <li>Do not post any massage, content and news that are obscene, vulgar, sexually-oriented hateful, threating and otherwise violative of any law.</li>
+        <li>Do not post any massage, content and news that are about marketing.</li>
+        <li>You must be 15 years of age or older to register.</li>
+        <li>You have to use your real information to register.</li>
+        <li>Administrators can delete or edit your massage, content or news.</li>
+        <li>Administration can deny or approve your request’s registration.</li>
+      </ol>
+    </div>
+  </div>
 
   <footer id="footer" class="text-center" style="margin-top: 3rem;">
-    <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน ธ.นำธรรมดี </span> </div>
+    <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน คนชอบปฏิบัติธรรม</span> </div>
     <div class="font-color1"> saharuthi_j@kkumail.com </div>
   </footer>
   <!-- Script -->

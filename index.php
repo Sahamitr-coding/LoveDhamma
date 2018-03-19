@@ -8,33 +8,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ธ.นำธรรมดี</title>
+  <title>ชุมชน คนชอบปฏิบัติธรรม</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link href="https://fonts.googleapis.com/css?family=Pattaya" rel="stylesheet">
+  <link href="css/main.css" rel="stylesheet">
   <link href="css/bootstrap-grid.css" rel="stylesheet">
   <link href="css/bootstrap-reboot.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Pattaya" rel="stylesheet">
   <link rel="stylesheet" href="css/reset.css" type="text/css" />
   <link rel="stylesheet" href="css/styles.css" type="text/css" />
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-  <link href="css/main.css" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="css/carousel.css">
-      <!-- เพิ่ม --> <link href="https://fonts.googleapis.com/css?family=Maitree|Trirong" rel="stylesheet">
+  <link href="css/carousel.css" rel="stylesheet" type="text/css" >
+        <!-- เพิ่ม --> <link href="https://fonts.googleapis.com/css?family=Maitree|Trirong" rel="stylesheet">
 </head>
 <body class="Backg-body">
-<!-- แก้ไข -->
-<header class="header_Bg">
-			<div class="navbar-header width">
-                <img class="img left" src="img/Logo1.png" alt="Logo1">
-                <spen class="right">
-                    <div><a class="btn-link" href="#">Sign In</a></div>
-                    <div><a class="btn-link" href="register.php">Register</a></div>
-                </spen>
-			</div>
-				
-		</header>
 
-    <nav id="mainnav">
+  <main role="main">
+   <!-- แก้ไข -->
+<header class="header_Bg">
+      <div class="navbar-header width">
+        <img class="img left" src="img/Logo1.png" alt="Logo1">
+        <spen class="right">
+            <div><a class="btn-link" href="#">Sign In</a></div>
+            <div><a class="btn-link" href="register.php">Register</a></div>
+        </spen>
+      </div>
+        
+    </header>
+
+     <nav id="mainnav">
       <div class="width">
           <ul>
               <li class="dropdown">
@@ -45,14 +47,14 @@
                   </div>
 
               </li>
-              <li><a href="#">Knowledge sources</a></li>
-              <li><a href="#">Events</a></li>
-              <li><a href="#">About us</a></li>
+              <li><a class="dropbtn2" href="#">Knowledge sources</a></li>
+              <li><a class="dropbtn2" href="#">Events</a></li>
+              <li><a class="dropbtn2" href="#">About us</a></li>
           </ul>
           <div class="clear"></div>
         <div class="clear"></div>
       </div>
-    </nav>  
+    </nav> 
     <!-- end แก้ไข -->
     <section id="main-slider" class="navbar-body no-margin">
     <div id="myCarousel" class=" carousel slide " data-ride="carousel">
@@ -125,7 +127,7 @@
        <div style="max-width: 90%; margin: 0px auto;" class="alert" role="alert">
         <div class="col-sm-6 alert d-block p-2 backg-news font-color1 border-white">
         <p class="font-color3 font-Tri" > <MARQUEE behavior=alternate direction=left scrollAmount=3 width="4%"><font face=Webdings >4</font></MARQUEE><b>News &amp; Announcement</b><MARQUEE behavior=alternate direction=right scrollAmount=3 width="4%"><font face=Webdings>3</font></MARQUEE> </p>
-          <ul class="get-data font-Tri text-left" id="list-data">
+          <ul class="get-data font-Tri text-left no-bullet" id="list-data">
             <?php
               foreach ($result as $news) {
                 $string = $news['title'];
@@ -147,7 +149,7 @@
     </section>
 
     <footer id="footer" class="text-center">
-     <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน ธ.นำธรรมดี </span> </div>
+     <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน คนชอบปฏิบัติธรรม</span> </div>
      <div class="font-color1"> saharuthi_j@kkumail.com </div>
     </footer>
     <!-- Script -->
