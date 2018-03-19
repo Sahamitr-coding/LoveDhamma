@@ -32,14 +32,14 @@
 
       //Check firstname and lastname in database.
       if($result){
-        $err['f_name'] = "* This first name already exist.";
-        $err['l_name'] = "* This last name already exist.";
+        $err['f_name'] = "* This firstname already exist.";
+        $err['l_name'] = "* This lastname already exist.";
       }else{
 
         //Firstname check
         if(isset($_POST['name']) && $_POST['name'] != null){
           if(strpbrk($_POST['name'], $illegal_no_need_num)){
-            $err['f_name'] = $special_char;
+            $err['f_name'] = "* Invalid input format.";
           }else{
               $err['f_name'] = "";
           }
@@ -50,7 +50,7 @@
         //Lastname check
         if(isset($_POST['surname']) && $_POST['surname'] != null){
           if(strpbrk($_POST['surname'], $illegal_no_need_num)){
-            $err['l_name'] = $special_char;
+            $err['l_name'] = "* Invalid input format.";
           }else{
               $err['l_name'] ="";     
           }
