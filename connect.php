@@ -2,6 +2,11 @@
 	$servername = "localhost";
 	$username = "root";
 	$password = "";
+	
+	//$servername = "10.66.199.227";
+	//$username = "Sec02_Saha";
+	//$password = H4s7cm39";
+
 
 	try {
 	    $conn = new PDO("mysql:host=$servername;dbname=sahamitr_coding;charset=utf8", $username, $password);

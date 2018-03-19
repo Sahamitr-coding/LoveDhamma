@@ -71,7 +71,7 @@
       if($id_result){
         $err['code_id'] = "* This national ID or passport ID already exist.";
       }else{  
-        if(strlen($_POST['code-id']) == 13 || strlen($_POST['code-id']) == 9){
+        if(strlen($_POST['code-id']) == 13 || (strlen($_POST['code-id']) <= 9 && strlen($_POST['code-id']) >= 7) ){
           if(strlen($_POST['code-id']) == 13){  //National ID
             for($j = 0, $sum = 0; $j < 12; $j++){
               $sum += (int)($_POST['code-id']{$j})*(13-$j);
@@ -81,7 +81,7 @@
                 $err['code_id'] = "* Invalid National ID or Passport ID format.";
               }
             }
-          }else if(strlen($_POST['code-id']) == 9 && !preg_match('/[a-zA-Z]{2}[0-9]{7}/', $_POST['code-id'])){  //Passport ID
+          }else if((strlen($_POST['code-id']) <= 9 && strlen($_POST['code-id']) >= 6) && !preg_match('/^[A-Z]{1,2}[0-9]{6,7}$/', $_POST['code-id'])){  //Passport ID
             $err['code_id'] = "";
           }
         }else{
@@ -147,7 +147,7 @@
       if(strpbrk($_POST['password'], $illegal_password)){
         $err['password'] = $special_char."except \"-\" or \"_\".";
       }else if(strlen($_POST['password']) < 16){
-        $err['password'] = "* Password length must more than 15 characters.";
+        $err['password'] = "* Password length must equal or more than 16 characters.";
       }else{
         $err['password'] ="";
       }
