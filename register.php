@@ -27,7 +27,9 @@
 
     //Check firstname and lastname in database.
     if(isset($_POST['name']) && isset($_POST['surname'])){
-      $sql = 'SELECT id FROM user WHERE name = "$_POST[name]" AND surname = "$_POST[surname]"';
+      $sql_name = $_POST['name'];
+      $sql_surname = $_POST['surname'];
+      $sql = "SELECT id FROM user WHERE name = '$sql_name' AND surname = '$sql_surname'";
       $result = ($conn->query($sql))->fetch();
 
       //Check firstname and lastname in database.
@@ -65,7 +67,8 @@
 
     //National ID check and Passport ID
     if(isset($_POST['code-id'])){
-      $sql = 'SELECT id FROM user WHERE national_id = "$_POST[code-id]"';
+      $sql_code_id = $_POST['code-id'];
+      $sql = "SELECT id FROM user WHERE national_id = $sql_code_id";
       $id_result = ($conn->query($sql))->fetch();
 
       if($id_result){
@@ -126,7 +129,8 @@
 
     //Username check
     if(isset($_POST['username']) && $_POST['username'] != null){
-      $sql = 'SELECT id FROM user WHERE username = "$_POST[username]"';
+      $sql_username = $_POST['username'];
+      $sql = "SELECT id FROM user WHERE username = '$sql_username'";
       $username_result = ($conn->query($sql))->fetch();
 
       if($username_result){
@@ -219,7 +223,9 @@
 
     //Email
     if(isset($_POST['email']) && $_POST['email'] != null){
-      $sql = 'SELECT id FROM user WHERE email = "$_POST[email]"';
+      $sql_email = $_POST['email'];
+
+      $sql = "SELECT id FROM user WHERE email = '$sql_email'";
       $email_result = ($conn->query($sql))->fetch();
 
       if($email_result){
