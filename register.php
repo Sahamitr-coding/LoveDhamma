@@ -24,7 +24,12 @@
     $blank_description = "* Please insert information.";
 
     $digit = '/([0-9]|[๐๑๒๓๔๕๖๗๘๙]{3})+/';  
-    $username_character = '/^[a-z A-Z 0-9 \- \_][a-z A-Z 0-9 \- \_]+[a-z A-Z 0-9 \- \_]$/';
+    $username_character = '/^[a-z A-Z 0-9 \- \_]+$/';
+
+    $small_alphabet = '/[a-z]+/';
+    $capital_alphabet = '/[A-Z]+/';
+    $numeric = '/[0-9]+/';
+
     $special_character_except_space = "#$%^&*()+=[]';,./{}|:<>?~@";
     $special_character_for_email = "#$%^&*()+=[]';,./{}|:<>?~";
     $special_character_underscore_dash_except_space = "#$%^&*()+=[]';,./{}|:<>?~@-_";
@@ -104,7 +109,7 @@
       $id_result = ($conn->query($sql))->fetch();
 
       if($id_result){
-        $err['code_id'] = "* This national ID or passport ID already exist.";
+        $err['code_id'] = "* National ID or passport ID already exist.";
       }else{  
         //print_r("NO ID IN DATABASE");
 
@@ -190,7 +195,7 @@
         $err['copy_file'] = "* File extension should be jpg, jpeg or png.";
       }
     }else{
-      $err['copy_file'] = "* Please add copy national id or passport id file.";
+      $err['copy_file'] = "* Please add copy national ID or passport ID file.";
     }
 
 
@@ -202,7 +207,7 @@
 
       //Uesrname already in database.
       if($username_result){
-        $err['username'] = "* This username already exist.";
+        $err['username'] = "* Username already exist.";
       }
       //Check input data
       else{
@@ -243,16 +248,32 @@
       }
       //Password length less than 16
       else if(strlen($_POST['password']) < 16){
-        $err['password'] = "* Password length must equal or more than 16 characters.";
+        $err['password'] = "* Password length must greater than or equal 16.";
       }
       //Password length >= 16
       else{
-        $err['password'] ="";
+
+        //True form password
+        if(preg_match($small_alphabet, $_POST['password']) && preg_match($capital_alphabet, $_POST['password'])
+            && preg_match($numeric, $_POST['password'])){
+
+          $err['password'] = "";
+
+        }
+
+        //Invalid form password
+        else{
+
+          $err['password'] = "* Password must has a-z, A-Z and 0-9 at lease one character.";
+
+        }
       }
     }
     //Blank
     else{
+
       $err['password'] = $blank_description;
+
     }
 
     //Confirm password
@@ -393,7 +414,7 @@
       //Check email in database
       if($email_result){
 
-        $err['e-email'] = "* This email already exist.";
+        $err['e-email'] = "* Email already exist.";
 
       }
       //Check new email

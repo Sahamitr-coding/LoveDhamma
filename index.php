@@ -42,7 +42,7 @@
               <li class="dropdown">
                   <button class="dropbtn"><a href="index.php">Home</a></button>
                   <div class="dropdown-content">
-                      <a href="news1.html">News and Announcement</a>
+                      <a href="#">News and Announcement</a>
 
                   </div>
 
@@ -127,7 +127,7 @@
        <div style="max-width: 90%; margin: 0px auto;" class="alert" role="alert">
         <div class="col-sm-6 alert d-block p-2 backg-news font-color1 border-white">
         <p class="font-color3 font-Tri" > <MARQUEE behavior=alternate direction=left scrollAmount=3 width="4%"><font face=Webdings >4</font></MARQUEE><b>News &amp; Announcement</b><MARQUEE behavior=alternate direction=right scrollAmount=3 width="4%"><font face=Webdings>3</font></MARQUEE> </p>
-          <ul class="get-data font-Tri text-left no-bullet" id="list-data">
+          <ul class="get-data font-Tri text-left no-bullet list_index" id="list-data">
             <?php
               foreach ($result as $news) {
                 $string = $news['title'];
@@ -143,7 +143,9 @@
               }
             ?>
           </ul>
-            <div id="load-more" class="load_more text-right font-Tri" data-id=<?php echo end($get_result)['id'];?>> more...</div>         
+            <div class="for_load_more text-right ">
+              <a id="load-more" class="load_more font-Tri" style=" font-weight: 800; color: #441701;" data-id=<?php echo end($get_result)['id'];?>> more...</a>
+            </div>         
       </div>
      </div>
     </section>

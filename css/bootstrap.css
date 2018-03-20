@@ -1725,7 +1725,14 @@ pre code {
   display: none;
 }
 
-.load_more{
+a#load-more {
+  margin-right: 0;
+  color: black;
+}
+
+a#load-more:hover{
+  color: #cc8828;
+  text-decoration: underline;
   cursor: pointer;
 }
 
@@ -3091,13 +3098,14 @@ fieldset:disabled a.btn {
 }
 
 .btn-link {
-  font-weight: 400;
-  color: #007bff;
+  font-weight: 700;
+  font-size: 18px;
+  color: #441701;
   background-color: transparent;
 }
 
 .btn-link:hover {
-  color: #0056b3;
+  color: #FFF162;
   text-decoration: underline;
   background-color: transparent;
   border-color: transparent;

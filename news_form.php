@@ -55,7 +55,7 @@
               <li class="dropdown">
                   <button class="dropbtn2" id="home"><a href="index.php">Home</a></button>
                   <div class="dropdown-content">
-                      <a class="dropbtn" href="news_form.php">News and Announcement</a>
+                      <a class="dropbtn" href="#">News and Announcement</a>
 
                   </div>
 
