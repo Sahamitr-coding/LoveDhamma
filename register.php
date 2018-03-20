@@ -1,5 +1,5 @@
 <?php
-  require('connect.php');
+  require_once('connect.php');
 
   if(isset($_POST['submit'])){
 
@@ -16,86 +16,153 @@
       "answer_2" => "",
       "answer_3" => "",
       "e-email" => "",
+      "register_e" => "",
     );
 
-    $special_char = "* Special character is not allowed.";
-    $please_insert_i = "* Please insert information.";
-    $illegal_e = "#$%^&*()+=[]';,/{}|:<>?~ ";
-    $illegal_no_need_num = "#$%^&*()+=[]';,./{}|:<>?~@ 0123456789๐๑๒๓๔๕๖๗๘๙";
-    $illegal_password = "#$%^&*()+=[]';,./{}|:<>?~@ ";
-    $illegal_answer = "#$%^&*()+=[]';,./{}|:<>?~@";
+    $special_char_space_fault = "* Special character and space is not allowed.";
+    $special_character_description = "* Special character is not allowed.";
+    $blank_description = "* Please insert information.";
+
+    $digit = '/([0-9]|[๐๑๒๓๔๕๖๗๘๙]{3})+/';  
+    $username_character = '/^[a-z A-Z 0-9 \- \_][a-z A-Z 0-9 \- \_]+[a-z A-Z 0-9 \- \_]$/';
+    $special_character_except_space = "#$%^&*()+=[]';,./{}|:<>?~@";
+    $special_character_for_email = "#$%^&*()+=[]';,./{}|:<>?~";
+    $special_character_underscore_dash_except_space = "#$%^&*()+=[]';,./{}|:<>?~@-_";
+
 
     //Check firstname and lastname in database.
-    if(isset($_POST['name']) && isset($_POST['surname'])){
+    if( isset($_POST['name']) && isset($_POST['surname'])){
       $sql_name = $_POST['name'];
       $sql_surname = $_POST['surname'];
-      $sql = "SELECT id FROM user WHERE name = '$sql_name' AND surname = '$sql_surname'";
-      $result = ($conn->query($sql))->fetch();
+      $sql = "SELECT * FROM user WHERE name = '$sql_name' AND surname = '$sql_surname'";
+      try{
+        $result = ($conn->query($sql))->fetch();
+        //Check firstname and lastname in database.
 
-      //Check firstname and lastname in database.
-      if($result){
-        $err['f_name'] = "* This firstname already exist.";
-        $err['l_name'] = "* This lastname already exist.";
-      }else{
+        if($result != null){
+          $err['f_name'] = "* This name already exist.";
+          $err['l_name'] = "* This name already exist.";
+        }else{
+    
+          //Firstname check
+          if(isset($_POST['name']) && $_POST['name'] != null){
 
-        //Firstname check
-        if(isset($_POST['name']) && $_POST['name'] != null){
-          if(strpbrk($_POST['name'], $illegal_no_need_num)){
-            $err['f_name'] = "* Invalid input format.";
-          }else{
+            //Check if has numeric
+            //print_r("DIGIT ". preg_match($digit, $_POST['name']));
+            if(preg_match($digit, $_POST['name'])){
+              $err['f_name'] = "* Invalid input format.";
+
+            }//Not numeric but special char
+            else if(strpbrk(' ', $_POST['name']) 
+              || strpbrk($_POST['name'] , $special_character_underscore_dash_except_space)){ 
+              $err['f_name'] = $special_char_space_fault;
+              
+            }//True
+            else{
               $err['f_name'] = "";
+            }
+          }//Has no input
+          else{
+            //print_r("NOINPUT : ");
+            $err['f_name'] = $blank_description;
           }
-        }else{
-          $err['f_name'] = $please_insert_i;
-        }
 
-        //Lastname check
-        if(isset($_POST['surname']) && $_POST['surname'] != null){
-          if(strpbrk($_POST['surname'], $illegal_no_need_num)){
-            $err['l_name'] = "* Invalid input format.";
-          }else{
-              $err['l_name'] ="";     
+          //Lastname check
+          if(isset($_POST['surname']) && $_POST['surname'] != null){
+
+            //Check if has numeric
+            if(preg_match($digit, $_POST['surname'])){
+              $err['l_name'] = "* Invalid input format.";
+
+            }//Not numeric but special char
+            else if(strpbrk(' ', $_POST['surname']) 
+              || strpbrk($_POST['surname'] , $special_character_underscore_dash_except_space)){ 
+              $err['l_name'] = $special_char_space_fault;
+              
+            }//True
+            else{
+              $err['l_name'] = "";
+            }
+          }//Has no input
+          else{
+            //print_r("NOINPUT : ");
+            $err['l_name'] = $blank_description;
           }
-        }else{
-          $err['l_name'] = $please_insert_i;
         }
-      }
+      }catch(Exception $e){
+        print_r($e);
+      } 
     }else{
-      $err['f_name'] = $please_insert_i;
-      $err['l_name'] = $please_insert_i;
+      $err['f_name'] = $blank_description;
+      $err['l_name'] = $blank_description;
     }
 
     //National ID check and Passport ID
     if(isset($_POST['code-id'])){
       $sql_code_id = $_POST['code-id'];
-      $sql = "SELECT id FROM user WHERE national_id = $sql_code_id";
+      $sql = "SELECT id FROM user WHERE national_id = '$sql_code_id'";
       $id_result = ($conn->query($sql))->fetch();
 
       if($id_result){
         $err['code_id'] = "* This national ID or passport ID already exist.";
       }else{  
-        if(strlen($_POST['code-id']) == 13 || (strlen($_POST['code-id']) <= 9 && strlen($_POST['code-id']) >= 7) ){
-          if(strlen($_POST['code-id']) == 13){  //National ID
+        //print_r("NO ID IN DATABASE");
+
+        //National ID check
+        if(strlen($_POST['code-id']) == 13 || 
+           (strlen($_POST['code-id']) <= 9 && strlen($_POST['code-id']) >= 7)){
+
+          //print_r("<br>NEW ID");
+
+          //Check National ID and Passport ID 
+          if(strlen($_POST['code-id']) == 13 
+            && preg_match('/[0-9]{13}/', $_POST['code-id'])){  
+
+            //print_r("NATIONAL ID CHECK");
+
+            //National ID
             for($j = 0, $sum = 0; $j < 12; $j++){
               $sum += (int)($_POST['code-id']{$j})*(13-$j);
               if((11 - ($sum % 11)) % 10 == (int)($_POST['code-id']{12})){
+
+                //print_r("NATIONAL ID :");
+
                 $err['code_id'] = "";
               }else{
-                $err['code_id'] = "* Invalid National ID or Passport ID format.";
+
+                $err['code_id'] = "* Invalid national ID or passport ID format.";
+
               }
             }
-          }else if((strlen($_POST['code-id']) <= 9 && strlen($_POST['code-id']) >= 6) && !preg_match('/^[A-Z]{1,2}[0-9]{6,7}$/', $_POST['code-id'])){  //Passport ID
+
+          }//Passport check
+          else if((strlen($_POST['code-id']) <= 9 && strlen($_POST['code-id']) >= 7)
+           && preg_match('/([A-Z]{1,2})([0-9]{6,7})/', $_POST['code-id'])){ 
+
+            //print_r("PASSPORT ID");
+
             $err['code_id'] = "";
+
+          }//Not both
+          else{
+            $err['code_id'] = "* Invalid national ID or passport ID format.";
           }
-        }else{
-          $err['code_id'] = "* Invalid National ID or Passport ID format.";
+
+        }// Not both
+        else{
+
+          $err['code_id'] = "* Invalid national ID or passport ID format.";
+
         }
       }
-    }else{
-      $err['code_id'] = $please_insert_i;
+    }//Blank
+    else{
+      $err['code_id'] = $blank_description;
     }
 
     //File check
+    $file = "";
+    $file_destination = "";
     if(isset($_FILES['file']) && $_FILES['file']['name'] != null){
       $file = $_FILES['file'];
       $filename = $file['name'];
@@ -111,7 +178,7 @@
           if($file['size'] < 5000000){
             $newfilename = uniqid('', true).".".$file_ext;
             $file_name_new = $newfilename;
-            $file_destination = 'uploads/'.$newfilename;
+            $file_destination = '\\uploads\\'.$newfilename;
             $err['copy_file'] = "";
           }else{
             $err['copy_file'] = "* Too much file size.";
@@ -123,7 +190,7 @@
         $err['copy_file'] = "* File extension should be jpg, jpeg or png.";
       }
     }else{
-      $err['copy_file'] = "* Please insert copy national id or passport id file.";
+      $err['copy_file'] = "* Please add copy national id or passport id file.";
     }
 
 
@@ -133,92 +200,187 @@
       $sql = "SELECT id FROM user WHERE username = '$sql_username'";
       $username_result = ($conn->query($sql))->fetch();
 
+      //Uesrname already in database.
       if($username_result){
         $err['username'] = "* This username already exist.";
-      }else{
-        if(strpbrk($_POST['username'], $illegal_password)){
-          $err['username'] = $special_char."except \"-\" or \"_\".";
-        }else{
+      }
+      //Check input data
+      else{
+
+        //Check special character and space
+        if(strpbrk($_POST['username'], $special_character_except_space)
+           || strpbrk($_POST['username'], ' ')){
+
+          $err['username'] = "* Special character is not allowed except \"-\" or \"_\".";
+
+        }
+        //Check form
+        else if(!preg_match($username_character, $_POST['username'])){
+
+          $err['username'] = "* Invalid input format.";
+          
+        }
+        //True form
+        else{
           $err['username'] = "";
         }
       }
-    }else{
-      $err['username'] = $please_insert_i;
+    }
+    //Blank
+    else{
+      $err['username'] = $blank_description;
     }
 
     //Password check
     if(isset($_POST['password']) && $_POST['password'] != null){
-      if(strpbrk($_POST['password'], $illegal_password)){
-        $err['password'] = $special_char."except \"-\" or \"_\".";
-      }else if(strlen($_POST['password']) < 16){
+
+      //Check special character and space
+      if(strpbrk($_POST['password'], $special_character_except_space)
+          || strpbrk($_POST['password'], ' ')){
+
+        $err['password'] = "* Special character is not allowed except \"-\" or \"_\".";
+
+      }
+      //Password length less than 16
+      else if(strlen($_POST['password']) < 16){
         $err['password'] = "* Password length must equal or more than 16 characters.";
-      }else{
+      }
+      //Password length >= 16
+      else{
         $err['password'] ="";
       }
-    }else{
-      $err['password'] = $please_insert_i;
+    }
+    //Blank
+    else{
+      $err['password'] = $blank_description;
     }
 
-    if(isset($_POST['password']) && isset($_POST['confirm-password']) && ($_POST['password'] !== $_POST['confirm-password'])){
-      $err['confirm_password'] = "Password doesn't match!.";
-    }else if($_POST['confirm-password'] == null){
-      $err['confirm_password'] = $please_insert_i;
-    }else{
-      $err['confirm_password'] = "";
+    //Confirm password
+    if(isset($_POST['confirm-password']) && $_POST['confirm-password'] != null){
+      //Check special character and space
+      if(strpbrk($_POST['confirm-password'], $special_character_except_space)
+          || strpbrk($_POST['confirm-password'], ' ')){
+
+        $err['confirm_password'] = "* Special character is not allowed except \"-\" or \"_\".";
+
+      }
+      //Check matching with password
+      else{
+        if($_POST['confirm-password'] === $_POST['password']){
+
+          $err['confirm_password'] = "";
+
+        }
+        //Not match
+        else{
+          $err['confirm_password'] = "* Password does not match.";
+        }
+      }
+    }
+    //Blank
+    else{
+      $err['confirm_password'] = $blank_description;
     }
   
     //Birth data check
     if(isset($_POST['birth-date']) && $_POST['birth-date'] != NULL){
-      if(strpbrk($_POST['birth-date'], $illegal_e)){
-        $err['birth_date'] = "You birth date maybe wrong.";
-      }else{
-        $date_now = strtotime("now");
-        $date_user = strtotime($_POST['birth-date']);
-        $date_should_less_or_equal_than = strtotime("-15 years", $date_now);
 
-        if($date_user > $date_should_less_or_equal_than){
-          $err['birth_date'] = "* You must be 15 years of age or older.";
-        }else{
-          $err['birth_date'] ="";
-        }
+      //Check birth date
+      
+      $date_now = strtotime("now");
+      $date_user = strtotime($_POST['birth-date']);
+      $date_should_less_or_equal_than = strtotime("-15 years", $date_now);
+
+      //Age less than 15 years old.
+      if($date_user > $date_should_less_or_equal_than){
+
+        $err['birth_date'] = "* You must be 15 years of age or older.";
+
       }
-    }else{
+      //Age greater than or equal 15 years old
+      else if($date_user <= $date_should_less_or_equal_than){
+
+        $err['birth_date'] ="";
+
+      }
+
+      //Age is null
+      if(!$date_user){
+
+        $err['birth_date'] ="* Invalid birth date.";
+
+      }
+    }
+    //Blank
+    else{
+
       $err['birth_date'] = "* Please insert date.";
+
     }
     
-
     //Answer1 check
     if(isset($_POST['first-answer']) && $_POST['first-answer'] != null){
-      if(strpbrk($_POST['first-answer'], $illegal_answer)){
-        $err['answer_1'] = $special_char;
-      }else{
-        $err['answer_1'] = "";
+
+      //Special character check
+      if(strpbrk($_POST['first-answer'], $special_character_except_space)){
+
+        $err['answer_1'] = $special_character_description;
+
       }
-    }else{
-      $err['answer_1'] = $please_insert_i;
+      //True form
+      else{
+
+        $err['answer_1'] = "";
+
+      }
+    }
+    //Blank
+    else{
+      $err['answer_1'] = $blank_description;
     }
 
     //Answer2 check
     if(isset($_POST['second-answer']) && $_POST['second-answer'] != null){
-      if(strpbrk($_POST['second-answer'], $illegal_answer)){
-        $err['answer_2'] = $special_char;
-      }else{
-        $err['answer_2'] = "";
-      }
-    }else{
-      $err['answer_2'] = $please_insert_i;
-    }
 
+      //Special character check
+      if(strpbrk($_POST['second-answer'], $special_character_except_space)){
+
+        $err['answer_2'] = $special_character_description;
+
+      }
+      //True form
+      else{
+
+        $err['answer_2'] = "";
+
+      }
+    }
+    //Blank
+    else{
+      $err['answer_2'] = $blank_description;
+    }
 
     //Answer3 check
     if(isset($_POST['third-answer']) && $_POST['third-answer'] != null){
-      if(strpbrk($_POST['third-answer'], $illegal_answer)){
-        $err['answer_3'] = $special_char;
-      }else{
-        $err['answer_3'] ="";
+
+      //Special character check
+      if(strpbrk($_POST['third-answer'], $special_character_except_space)){
+
+        $err['answer_3'] = $special_character_description;
+
       }
-    }else{
-      $err['answer_3'] = $please_insert_i;
+      //True form
+      else{
+
+        $err['answer_3'] ="";
+
+      }
+    }
+    //Blank
+    else{
+
+      $err['answer_3'] = $blank_description;
+
     }
 
     //Email
@@ -228,21 +390,43 @@
       $sql = "SELECT id FROM user WHERE email = '$sql_email'";
       $email_result = ($conn->query($sql))->fetch();
 
+      //Check email in database
       if($email_result){
+
         $err['e-email'] = "* This email already exist.";
-      }else{
-        if(strpbrk($_POST['email'], $illegal_e)){
-          $err['e-email'] = $special_char;
-        }else{
+
+      }
+      //Check new email
+      else{
+
+        //Check special character and space
+        if(strpbrk($_POST['email'], $special_character_for_email)
+            && strpbrk($_POST['email'], ' ')){
+
+          $err['e-email'] = $special_character_description;
+
+        }
+        //Check email format
+        else{
           if(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)){
-              $err['e-email'] = "* Invalid email format."; 
-          }else{
+
+              $err['e-email'] = "* Invalid email."; 
+
+          }
+          //True form
+          else{
+
             $err['e-email'] ="";
+
           }
         }
       }
-    }else{
-      $err['e-email'] = $please_insert_i;
+    }
+    //Blank
+    else{
+
+      $err['e-email'] = $blank_description;
+
     }
 
     $i = 0;
@@ -269,7 +453,10 @@
 
     $email = $_POST['email'];
 
+
+    //If no errors occurred.
     if(!$i){
+      /*
       $to = $email;
       $subject = "Test send email";
       $message = "My Body & My Desctription";
@@ -277,17 +464,69 @@
                 "Reply-To: wasitthaphon@gmail.com"." \r\n".
                 "X-Mailer: PHP/".phpversion();
       $flag = @mail($to, $subject, $message, $header);
-
+      */
       //Dont forget to set flag!
-      if(true){
-        $sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name_new', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a', '$email', 0, 0)";
-        $conn->exec($sql_str);
-        move_uploaded_file($file['tmp_name'], $file_destination);
-        header("Location: Successful.html");
+      //Check for email was sent.
+      if(1){
+
+        $file_name = $file_name_new;
+        $file_type = $file['type'];
+        $file_size = $file['size'];
+        $file_content = file_get_contents($file['tmp_name']);
+        $file_content = addslashes($file_content);
+
+        /*print_r($file);
+        print_r(realpath(dirname(__FILE__)));
+        print_r($file_destination);
+        */
+
+        //Check Upload file is come from file input form
+        if(is_uploaded_file($file['tmp_name'])){
+
+          $doc_path = realpath(dirname(__FILE__));
+
+          //Is upload to directory complete
+          if(move_uploaded_file($file['tmp_name'], $doc_path.$file_destination)){
+
+            //no insert content.
+            $file_content = 0;
+
+          }
+
+          //Query command
+          $sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name', '$file_type', '$file_size', '$file_content', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a', '$email', 0, 0)";
+
+          //Insert to database success
+          if($conn->exec($sql_str)){
+
+            header("Location: Successful.html");
+
+          }
+          //Insert fail.
+          else{
+
+            $err['register_e'] = "* Can't register.";
+
+          }
+
+        }
+        //Upload file doesnt com from input file form
+        else{
+
+          echo "file upload failed.";
+
+        }
+      }else{
+        $err['register_e'] = "* Can't register.";
       }
+    }else{
+      $err['register_e'] = "* Can't register.";
     }
 
-  }else{      //No POST action occure.
+  }
+  //No POST action
+  else{
+
     $err = array(
       "f_name" => "",
       "l_name" => "",
@@ -301,6 +540,7 @@
       "answer_2" => "",
       "answer_3" => "",
       "e-email" => "",
+      "register_e" => "",
     );
   }
   //print_r($err);
@@ -507,7 +747,7 @@
 
             <!-- insert question here -->
             <option selected value="1">What is the name of your pet?</option>
-            <option value="2">What is the name of your pet?</option>
+            <option value="2">What is your favorite color?</option>
             <option value="3">What is your best friend’s name?</option>
             <option value="4">What is your favorite song?</option>
             <option value="5">What is your favorite singer?</option>
@@ -603,8 +843,15 @@
 
       <center>
         <!-- Agreement -->
-        <input type="checkbox" name="accept-agreement" value="1" id="accept-agreement" required> I agree <a href="#openModal" style="text-decoration:"offne;">agreement.<a>
-        <br><br>
+        <input type="checkbox" name="accept-agreement" value="1" id="accept-agreement" required> I agree <a href="#openModal" style="text-decoration:"offne;">agreement.</a>
+        <br>
+        <br>
+        <small id="register-help" class="form-text" style="color: red;">
+          <?php
+            echo $err['register_e'];
+          ?>
+        </small>
+        
         <button id="submit" class="btn btn-primary" name="submit">Register</button>
       </center>
     </form>
