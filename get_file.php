@@ -8,7 +8,7 @@
 
     $word = array("BDcc11", "Bc1", "11xBB", "1111", "Wasitthaphon583020354-7", "aaaa", "a(#*r");
 
-    $username_character = '/^[a-z A-Z 0-9 \- \_]*([a-z]+|[A-Z]+|[0-9]+)+[\- \_]*[a-z A-Z 0-9 \- \_]$/';
+    $username_character = '/^[a-z A-Z 0-9 \- \_ ก-ฮ ๐-๙ ฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์]+$/';
 
     $small_alphabet = '/[a-z]+/';
     $capital_alphabet = '/[A-Z]+/';
@@ -26,7 +26,9 @@
     echo preg_match($username_character, "AA1กด23456"). "<br>";
     echo preg_match($username_character, "กดA12345"). "<br>";
     echo preg_match($username_character, "A1*$23456"). "<br>";
-    echo preg_match($username_character, "AAAA_-12345"). "<br>";
+    echo preg_match($username_character, "วสิษฐพ()ล_๙๙"). "<br>";
+    echo preg_match($username_character, "๓ทหาร#เสือBB"). "<br>";
+    echo preg_match($username_character, "โรยั๗๗L"). "<br>";
     echo "PASSS";
 
 	echo preg_match($match, "123"). "<br>";
@@ -50,5 +52,7 @@
     echo preg_match($special, "FFกกกก"). "<br>";
     echo preg_match($special, "ขขAAA");
 	
+
+    echo password_hash("Wasitthaphon123456", PASSWORD_BCRYPT);
 
 ?>

@@ -2257,8 +2257,9 @@ var Modal = function ($$$1) {
 
     _proto._adjustDialog = function _adjustDialog() {
       var isModalOverflowing = this._element.scrollHeight > document.documentElement.clientHeight;
-
+      //Edit modal 22-Mar-18
       if (!this._isBodyOverflowing && isModalOverflowing) {
+
         this._element.style.paddingLeft = this._scrollbarWidth + "px";
       }
 
