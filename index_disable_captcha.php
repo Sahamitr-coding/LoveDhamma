@@ -46,7 +46,7 @@
               <?php 
                 if(isset($_SESSION['user_data'])){
                   $html_username_tag = "<div><a id=\"open_username\" class=\"btn-link\" href=\"profile.php\">สวัสดีคุณ ".$_SESSION['user_data']['username']."</a></div>";
-                  $html_sign_out = "<div><a id=\"sign_out\" class=\"btn-link\" href=\"index.php?sign_out\">Sign out</a></div>";
+                  $html_sign_out = "<div><a id=\"sign_out\" class=\"btn-link\" href=\"index_disable_captcha.php?sign_out\">Sign out</a></div>";
 
                   echo $html_username_tag.$html_sign_out;
 
@@ -68,7 +68,7 @@
       <div class="width">
           <ul>
               <li class="dropdown">
-                  <button class="dropbtn"><a href="index.php">Home</a></button>
+                  <button class="dropbtn"><a href="index_disable_captcha.php">Home</a></button>
                   <div class="dropdown-content">
                       <a href="#">News and Announcement</a>
 
@@ -130,7 +130,7 @@
                 "<img src=\"news-img/". $get_result[$i]['id']."/" .$img_result['name']. "\">".
                 "<div class=\"container\">".
                 "<div class=\"carousel-caption\">".
-                  "<a href=\"news_form.php?id=".$get_result[$i]['id']."\" target=\"_blank\">".
+                  "<a href=\"news_form_disable_captcha.php?id=".$get_result[$i]['id']."\" target=\"_blank\">".
                     "<h1>".$get_result[$i]['title'].
                     "</h1>
                     </a>
@@ -167,7 +167,7 @@
                   $catdate = "&nbsp;&nbsp;&nbsp;&nbsp;".date('d', $timestamp)."-".date('m',$timestamp)."-".(int)(date('Y', $timestamp) + 543);
                   $string .= $catdate;*/
                 $string = iconv("UTF-8", "UTF-8//IGNORE", $string);
-                echo "<li><a id=\"".$news['id']."\" href=\"news_form.php?id=".$news['id']."\" target=\"_blank\" class=\"font-color4\">". $string."</a></li>";
+                echo "<li><a id=\"".$news['id']."\" href=\"news_form_disable_captcha.php?id=".$news['id']."\" target=\"_blank\" class=\"font-color4\">". $string."</a></li>";
               }
             ?>
           </ul>
@@ -214,7 +214,6 @@
           }
           else {
             $('#captcha-description').text('* Invalid captcha');
-            document.getElementById('captcha-description').style.color = "red";
             ChangeCaptcha();
           }
         }
@@ -222,7 +221,7 @@
     </center>
     <center><input id="CaptchaEnter" size="20" maxlength="6"><center><br>
     <center><span id="captcha-description"></span></center>
-    <center><button id="captcha-confirm-button" class="sign_in_button" onclick="check()">SIGN IN</button></center>
+    <center><button id="confirm-button" class="sign_in_button">SIGN IN</button></center>
     <div id="sign_in_button_click"></div>
   </div>
 </div>
@@ -286,6 +285,10 @@
       });
     });
 
+    $('#confirm-button').on('click', function(e){
+        $('#sign_in_button_click').click();
+    });
+
     $('#username-sign-in').on('click', function(e){
       e.preventDefault();
       $('#username-description').text('');
@@ -298,11 +301,11 @@
       $('#password-sign-in').val('');
     });
 
-    $('#CaptchaEnter').on('click', function(e){
+    /*$('#CaptchaEnter').on('click', function(e){
       e.preventDefault();
       $('#CaptchaEnter').val('');
       $('#captcha-description').text('');
-    });
+    });*/
 
     $('#sign_in_button_click').on('click', function(e){
 
@@ -312,7 +315,7 @@
       
 
       var pattern = /^[a-z A-Z 0-9 \- \_ ก-ฮ ๐-๙ ฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์]+$/;
-      var password_pattern = /^[\#\$\%\^\&\*\(\)\+\=\[\]\'\;\,.\/\{\}\|\:\<\>\?\~\@]+$/;
+      var password_pattern = /^[a-z A-Z 0-9 \- \_]+$/;
       if(username == '' || password == ''){
         if(username == ''){
           $('#username-description').text('* Please insert username.');
@@ -324,20 +327,20 @@
           document.getElementById('password-description').style.color = "red";
         }
 
-        ChangeCaptcha();
+        //ChangeCaptcha();
 
-      }else if(!pattern.test(username) || password_pattern.test(password)){
+      }else if(!pattern.test(username) || !password_pattern.test(password)){
         if(!pattern.test(username)){
           $('#username-description').text('* Special character is not allowed.');
           document.getElementById('username-description').style.color = "red";
         }
 
-        if(password_pattern.test(password)){
+        if(!password_pattern.test(password)){
           $('#password-description').text('* Special character is not allowed.');
           document.getElementById('password-description').style.color = "red";
         }
 
-        ChangeCaptcha();
+        //ChangeCaptcha();
 
       }else{
         $.ajax({
@@ -345,21 +348,22 @@
           data: {username:username, password:password},
           type: 'POST',
           success: function(value){
+            console.log(value);
             if(value == 'false'){
 
               $('#password-description').text('* Invalid username and password.');
               document.getElementById('password-description').style.color = "red";
 
-              ChangeCaptcha();
+              //ChangeCaptcha();s
 
             }else if(value == 'invalid_password'){
               $('#password-description').text('* Invalid username or password.');
               document.getElementById('password-description').style.color = "red";
 
-              ChangeCaptcha();
+              //ChangeCaptcha();
 
             }else if(value == 'pass'){
-              window.location.href = "index.php";
+              window.location.href = "index_disable_captcha.php";
             }
           }
         });

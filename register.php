@@ -30,7 +30,7 @@
     $numeric = '/[0-9]+/';
 
     $special_character_except_space = "#$%^&*()+=[]';,./{}|:<>?~@";
-    $special_character_for_email = "#$%^&*()+=[]';,./{}|:<>?~";
+    $special_character_for_email = "#$%^&*()+=[]';,/{}|:<>?~";
     $special_character_underscore_dash_except_space = "#$%^&*()+=[]';,./{}|:<>?~@-_";
 
 
@@ -106,6 +106,7 @@
       $sql_code_id = $_POST['code-id'];
       $sql = "SELECT id FROM user WHERE national_id = '$sql_code_id'";
       $id_result = ($conn->query($sql))->fetch();
+      //print_r($id_result);
 
       if($id_result){
         $err['code_id'] = "* National ID or passport ID already exist.";
@@ -420,8 +421,8 @@
       else{
 
         //Check special character and space
-        if(strpbrk($_POST['email'], $special_character_for_email)
-            && strpbrk($_POST['email'], ' ')){
+        $str = explode("@", $_POST['email']);
+        if(strpbrk($special_character_for_email, $str[0]) || strpbrk($special_character_for_email, $str[1])){
 
           $err['e-email'] = $special_character_description;
 
@@ -519,7 +520,7 @@
           //Insert to database success
           if($conn->exec($sql_str)){
 
-            header("Location: Successful.html");
+            header("Location: Successful.php");
 
           }
           //Insert fail.
@@ -586,7 +587,7 @@
 
   <main role="main">
    <!-- แก้ไข -->
-<header class="header_Bg">
+    <header class="header_Bg">
       <div class="navbar-header width">
         <img class="img left" src="img/Logo1.png" alt="Logo1">
         <spen class="right">
@@ -944,13 +945,14 @@
             }
             else {
               $('#captcha-description').text('* Invalid captcha');
+              document.getElementById('captcha-description').style.color = "red";
               ChangeCaptcha();
             }
           }
           </script>
       </center>
       <center><input id="CaptchaEnter" size="20" maxlength="6"><center><br>
-      <center><div id="sign_in_button_click"></div></center>
+      <center><span id="captcha-description"></span></center>
       <center><button  class="sign_in_button" onclick="check()">SIGN IN</button></center>
       <div id="sign_in_button_click"></div>
     </div>
@@ -992,7 +994,7 @@
       
 
       var pattern = /^[a-z A-Z 0-9 \- \_ ก-ฮ ๐-๙ ฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์]+$/;
-      var password_pattern = /^[\#\$\%\^\&\*\(\)\+\=\[\]\'\;\,.\/\{\}\|\:\<\>\?\~\@]+$/;
+      var password_pattern = /^[#$%^&*()+=[\]';,./{}|:<>?~@]+$/;
       if(username == '' || password == ''){
         if(username == ''){
           $('#username-description').text('* Please insert username.');

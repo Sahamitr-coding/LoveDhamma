@@ -155,13 +155,14 @@
               }
               else {
                 $('#captcha-description').text('* Invalid captcha');
+                document.getElementById('captcha-description').style.color = "red";
                 ChangeCaptcha();
               }
             }
             </script>
         </center>
         <center><input id="CaptchaEnter" size="20" maxlength="6"><center><br>
-        <denter><div id="sign_in_button_click"></div></denter>
+        <center><span id="captcha-description"></span></center>
         <center><button  class="sign_in_button" onclick="check()">SIGN IN</button></center>
         <div id="sign_in_button_click"></div>
       </div>

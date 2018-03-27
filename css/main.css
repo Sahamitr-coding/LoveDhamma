@@ -118,10 +118,11 @@ h1 {
 #text_right { text-align:right; }
 #text_left { text-align:left; }
         
-        input[type=text], input[type=password] {
+        input[type=text], input[type=password], input[type=date], input[type=email] {
     width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
+    padding: 7px 20px;
+    margin-top: 0;
+
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;
@@ -147,7 +148,9 @@ h1 {
     padding: 16px;
 }
 
-
+#CaptchaEnter{
+  margin-top: 10px;
+}
 
 .modalDialog {
   position: fixed;
