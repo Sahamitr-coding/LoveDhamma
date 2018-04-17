@@ -126,9 +126,6 @@
     </div>
 
 
-    
-
-
     <footer id="footer" class="text-center fixed">
      <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน คนชอบปฏิบัติธรรม</span> </div>
      <div class="font-color1"> saharuthi_j@kkumail.com </div>
@@ -138,45 +135,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
     <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
-
-
-    <!--<script>
-
-     function showMore(){
-
-      var s = $('.table tbody#more tr td').length;
-      console.log(s);
-      var x = (x+10 <= s) ? x+10 : s;
-      $('.table tbody#more tr td:lt('+x+')').show(); 
-     }
-
-    $(function(){
-      $("body").on('click', '.load_more', function(){
-        var lastid = $(this).attr('data-id');
-        var current = $(this);
-        console.log(lastid);
-        
-        $.post("page.php",{lastId:lastid}, function(data){
-            current.closest("li").remove();
-
-            str = data.split("<li>");
-            for(var i = 1; i < str.length - 1; i++){
-              str[i] = '<li>'+str[i];
-              $(".get-data").append(str[i]);
-            }
-            
-            if(str[str.length - 1] > 1){
-              $('.load_more').attr('data-id', parseInt(str[str.length-1]));
-            }else{
-              $('.load_more').remove();
-            }
-        });
-      });
-    });
-
-    </script> -->
-
-
   </main>
 </body>
 </html>

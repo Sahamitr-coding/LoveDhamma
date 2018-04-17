@@ -123,7 +123,10 @@
     <div id="openModal_sign_in" class="sign_in_modalDialog">
       <div>
         <a href="#sign_in_close" title="sign_in_close" class="sign_in_close">X</a>
-        <h2>Login</h2>
+        <h2>Sign in</h2>
+        <div class="text-center">
+          <span id="sign-in-description"></span>
+        </div>
         <div id="text_left" class="sign_in_container">
           <label for="username-sign-in"><b>Username</b></label>
           <input type="text" autocomplete="off" name="username-sign-in" id="username-sign-in">
@@ -133,7 +136,7 @@
           <input type="password" autocomplete="off" name="password-sign-in" id="password-sign-in">
           <span id="password-description"></span>
           <br>
-          <a href="#" id="text_right">Forgot Password</a><br>
+          <a href="#" id="forget_password">Forget Password</a><br>
         </div>
         <body onLoad="ChangeCaptcha()">
         <center><input type="text" id="randomfield" disabled></center>
@@ -150,13 +153,19 @@
               document.getElementById('randomfield').value = ChangeCaptcha;
             }
             function check() {
+              var description = "* Please enter username and password correctly.";
+              var username = $('#username-sign-in').val();
+              var password = $('#password-sign-in').val();
+              var captcha = $('#CaptchaEnter').val();
               if(document.getElementById('CaptchaEnter').value == document.getElementById('randomfield').value ) {
                 document.getElementById('sign_in_button_click').click();
               }
               else {
-                $('#captcha-description').text('* Invalid captcha');
-                document.getElementById('captcha-description').style.color = "red";
-                ChangeCaptcha();
+                if(username != '' || password != '' || captcha != ''){
+                  $('#sign-in-description').text(description);
+                  document.getElementById('sign-in-description').style.color = "red";
+                  ChangeCaptcha();
+                }
               }
             }
             </script>
@@ -173,9 +182,10 @@
      <div class="font-color1"> saharuthi_j@kkumail.com </div>       
     </footer>
     <!-- Script -->
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="offnymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="offnymous"></script>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
     <script>
       /* When the user clicks on the button, 
       toggle between hiding and showing the dropdown content */
@@ -198,85 +208,95 @@
         }
       }
 
-      $('#username-sign-in').on('click', function(e){
-        e.preventDefault();
-        $('#username-description').text('');
-        $('#username-sign-in').val('');
-      });
+    $('#username-sign-in').on('click', function(e){
+      e.preventDefault();
+      $('#sign-in-description').text('');
+      $('#username-sign-in').val('');
+    });
 
-      $('#password-sign-in').on('click', function(e){
-        e.preventDefault();
-        $('#password-description').text('');
-        $('#password-sign-in').val('');
-      });
+    $('#password-sign-in').on('click', function(e){
+      e.preventDefault();
+      $('#sign-in-description').text('');
+      $('#password-sign-in').val('');
+    });
 
-      $('#CaptchaEnter').on('click', function(e){
-        e.preventDefault();
-        $('#CaptchaEnter').val('');
-        $('#captcha-description').text('');
-      });
+    $('#CaptchaEnter').on('click', function(e){
+      e.preventDefault();
+      $('#CaptchaEnter').val('');
+      $('#captcha-description').text('');
+    });
 
-      $('#sign_in_button_click').on('click', function(e){
-
-        e.preventDefault();
-        var username = $('#username-sign-in').val();
-        var password = $('#password-sign-in').val();
-        
-
-        var pattern = /^[a-z A-Z 0-9 \- \_ ก-ฮ ๐-๙ ฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์]+$/;
-        var password_pattern = /^[\#\$\%\^\&\*\(\)\+\=\[\]\'\;\,.\/\{\}\|\:\<\>\?\~\@]+$/;
-        if(username == '' || password == ''){
-          if(username == ''){
-            $('#username-description').text('* Please insert username.');
-            document.getElementById('username-description').style.color = "red";
+    $('#forget_password').on('click', function(e){
+      e.preventDefault();
+      var username = $('#username-sign-in').val();
+      var password = $('#password-sign-in').val();
+      var description = "* Please enter username and password correctly.";
+    
+      $.ajax({
+        url: 'login_check.php',
+        data: {username:username, password:password, data_sending_type:"forget_pwd"},
+        type: 'POST',
+        success: function(value){
+          console.log(value);
+          if(value == 'invalid_password' || value == 'pass'){
+            window.location.href = "Question.php?username=" + username;
+          }else{
+            $('#sign-in-description').text(description);
+            document.getElementById('sign-in-description').style.color = "red";
+            ChangeCaptcha();
           }
-
-          if(password == ''){
-            $('#password-description').text('* Please insert password.');
-            document.getElementById('password-description').style.color = "red";
-          }
-
-          ChangeCaptcha();
-
-        }else if(!pattern.test(username) || password_pattern.test(password)){
-          if(!pattern.test(username)){
-            $('#username-description').text('* Special character is not allowed.');
-            document.getElementById('username-description').style.color = "red";
-          }
-
-          if(password_pattern.test(password)){
-            $('#password-description').text('* Special character is not allowed.');
-            document.getElementById('password-description').style.color = "red";
-          }
-
-          ChangeCaptcha();
-
-        }else{
-          $.ajax({
-            url: 'login_check.php',
-            data: {username:username, password:password},
-            type: 'POST',
-            success: function(value){
-              if(value == 'false'){
-
-                $('#password-description').text('* Invalid username and password.');
-                document.getElementById('password-description').style.color = "red";
-
-                ChangeCaptcha();
-
-              }else if(value == 'invalid_password'){
-                $('#password-description').text('* Invalid username or password.');
-                document.getElementById('password-description').style.color = "red";
-
-                ChangeCaptcha();
-
-              }else if(value == 'pass'){
-                window.location.href = "index.php";
-              }
-            }
-          });
         }
       });
+    });
+
+    $('#sign_in_button_click').on('click', function(e){
+
+      e.preventDefault();
+      var username = $('#username-sign-in').val();
+      var password = $('#password-sign-in').val();
+      var description = "* Please enter username and password correctly.";
+      
+
+      var pattern = /^[a-z A-Z 0-9 \- \_ ก-ฮ ๐-๙ ฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์]+$/;
+      var password_pattern = /^[\#\$\%\^\&\*\(\)\+\=\[\]\'\;\,.\/\{\}\|\:\<\>\?\~\@]+$/;
+      if(username == '' || password == ''){
+        $('#sign-in-description').text(description);
+        document.getElementById('sign-in-description').style.color = "red";
+
+        ChangeCaptcha();
+
+      }else if(!pattern.test(username) || password_pattern.test(password)){
+        $('#sign-in-description').text(description);
+        document.getElementById('sign-in-description').style.color = "red";
+
+        ChangeCaptcha();
+
+      }else{
+        $.ajax({
+          url: 'login_check.php',
+          data: {username:username, password:password},
+          type: 'POST',
+          success: function(value){
+            if(value == 'false'){
+
+              $('#sign-in-description').text(description);
+              document.getElementById('sign-in-description').style.color = "red";
+
+              ChangeCaptcha();
+
+            }else if(value == 'invalid_password'){
+              $('#sign-in-description').text(description);
+              document.getElementById('sign-in-description').style.color = "red";
+
+              ChangeCaptcha();
+
+            }else if(value == 'pass'){
+              window.location.href = "index.php";
+            }
+          }
+        });
+      }
+    });
     </script>
   </main>
 </body>

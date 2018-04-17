@@ -1,10 +1,17 @@
 <?php
   require_once('connect.php');
+  use PHPMailer\PHPMailer\PHPMailer;
+  use PHPMailer\PHPMailer\Exception;
+
+  require 'PHPMailer/vendor/phpmailer/phpmailer/src/Exception.php';
+  require 'PHPMailer/vendor/phpmailer/phpmailer/src/PHPMailer.php';
+  require 'PHPMailer/vendor/phpmailer/phpmailer/src/SMTP.php';
+  date_default_timezone_set('Asia/Bangkok');
+
   if(isset($_POST['submit'])){
 
     $err = array(
-      "f_name" => "",
-      "l_name" => "",
+      "name" => "",
       "code_id" => "",
       "copy_file" => "",
       "username" => "",
@@ -28,77 +35,70 @@
     $small_alphabet = '/[a-z]+/';
     $capital_alphabet = '/[A-Z]+/';
     $numeric = '/[0-9]+/';
+    //$password_special_character = '/[\- \_]+/';
 
     $special_character_except_space = "#$%^&*()+=[]';,./{}|:<>?~@";
     $special_character_for_email = "#$%^&*()+=[]';,/{}|:<>?~";
     $special_character_underscore_dash_except_space = "#$%^&*()+=[]';,./{}|:<>?~@-_";
 
-
     //Check firstname and lastname in database.
-    if( isset($_POST['name']) && isset($_POST['surname'])){
+    if(isset($_POST['name'])){
       $sql_name = $_POST['name'];
-      $sql_surname = $_POST['surname'];
-      $sql = "SELECT * FROM user WHERE name = '$sql_name' AND surname = '$sql_surname'";
+
+      $sql_name = explode(" ", $sql_name);
+      if(count($sql_name) == 3){
+        $f_name = $sql_name[0];
+        $l_name = $sql_name[1]." ".$sql_name[2];
+      }else if(count($sql_name) == 2){
+        $f_name = $sql_name[0];
+        $l_name = $sql_name[1];
+      }else if(count($sql_name) == 4){
+        $f_name = $sql_name[0];
+        $l_name = $sql_name[1]." ".$sql_name[2]." ".$sql_name[3];
+      }else{
+        $f_name = "";
+        $l_name = "";
+      }
+
+      $sql = "SELECT * FROM user WHERE name = '$f_name' AND surname = '$l_name'";
       try{
         $result = ($conn->query($sql))->fetch();
         //Check firstname and lastname in database.
 
         if($result != null){
-          $err['f_name'] = "* This name already exist.";
-          $err['l_name'] = "* This name already exist.";
+          $err['name'] = "* This name already exist.";
         }else{
     
-          //Firstname check
+          //New name
           if(isset($_POST['name']) && $_POST['name'] != null){
 
             //Check if has numeric
             //print_r("DIGIT ". preg_match($digit, $_POST['name']));
-            if(preg_match($digit, $_POST['name'])){
-              $err['f_name'] = "* Invalid input format.";
+            $str_name_check = $_POST['name'];
+            $str_name_check = explode(" ", $str_name_check);
+
+            if(preg_match($digit, $_POST['name']) || count($str_name_check) > 4 || count($str_name_check) == 1){
+              $err['name'] = "* Invalid input format.";
 
             }//Not numeric but special char
-            else if(strpbrk(' ', $_POST['name']) 
-              || strpbrk($_POST['name'] , $special_character_underscore_dash_except_space)){ 
-              $err['f_name'] = $special_char_space_fault;
+            else if(strpbrk($_POST['name'] , $special_character_underscore_dash_except_space)){ 
+              $err['name'] = $special_char_space_fault;
               
             }//True
             else{
-              $err['f_name'] = "";
+              $err['name'] = "";
             }
           }//Has no input
           else{
             //print_r("NOINPUT : ");
-            $err['f_name'] = $blank_description;
-          }
-
-          //Lastname check
-          if(isset($_POST['surname']) && $_POST['surname'] != null){
-
-            //Check if has numeric
-            if(preg_match($digit, $_POST['surname'])){
-              $err['l_name'] = "* Invalid input format.";
-
-            }//Not numeric but special char
-            else if(strpbrk(' ', $_POST['surname']) 
-              || strpbrk($_POST['surname'] , $special_character_underscore_dash_except_space)){ 
-              $err['l_name'] = $special_char_space_fault;
-              
-            }//True
-            else{
-              $err['l_name'] = "";
-            }
-          }//Has no input
-          else{
-            //print_r("NOINPUT : ");
-            $err['l_name'] = $blank_description;
+            $err['name'] = $blank_description;
           }
         }
       }catch(Exception $e){
         print_r($e);
       } 
     }else{
-      $err['f_name'] = $blank_description;
-      $err['l_name'] = $blank_description;
+      $err['name'] = $blank_description;
     }
 
     //National ID check and Passport ID
@@ -180,7 +180,7 @@
       $allowed = array('jpg', 'jpeg', 'png');
       if(in_array($file_ext, $allowed)){
         if($file['error'] === 0){
-          if($file['size'] < 5000000){
+          if($file['size'] < 50000000){
             $newfilename = uniqid('', true).".".$file_ext;
             $file_name_new = $newfilename;
             $file_destination = '\\uploads\\'.$newfilename;
@@ -310,15 +310,15 @@
       
       $date_now = strtotime("now");
       $date_user = strtotime($_POST['birth-date']);
-      $date_should_less_or_equal_than = strtotime("-15 years", $date_now);
+      $date_should_less_or_equal_than = strtotime("-20 years", $date_now);
 
-      //Age less than 15 years old.
+      //Age less than 20 years old.
       if($date_user > $date_should_less_or_equal_than){
 
-        $err['birth_date'] = "* You must be 15 years of age or older.";
+        $err['birth_date'] = "* You must be 20 years of age or older.";
 
       }
-      //Age greater than or equal 15 years old
+      //Age greater than or equal 20 years old
       else if($date_user <= $date_should_less_or_equal_than){
 
         $err['birth_date'] ="";
@@ -406,10 +406,28 @@
 
     //Email
     if(isset($_POST['email']) && $_POST['email'] != null){
+
+      $str_email = explode("@", $_POST['email']);
+
+      $mail_file = fopen("email_provider.txt", "r");
+      $valid_provider = 0;
+
+      //Email provider
+      if(strpos(file_get_contents("email_provider.txt"), 
+        $str_email[1])){
+        $valid_provider = 1;
+      }
+
+      fclose($mail_file);
+
       $sql_email = $_POST['email'];
 
-      $sql = "SELECT id FROM user WHERE email = '$sql_email'";
-      $email_result = ($conn->query($sql))->fetch();
+      //filter special character.
+      if(!(strpbrk($special_character_for_email, $str_email[0]) 
+        || strpbrk($special_character_for_email, $str_email[1]))){
+         $sql = "SELECT id FROM user WHERE email = '$sql_email'";
+         $email_result = ($conn->query($sql))->fetch();
+      }
 
       //Check email in database
       if($email_result){
@@ -421,16 +439,15 @@
       else{
 
         //Check special character and space
-        $str = explode("@", $_POST['email']);
-        if(strpbrk($special_character_for_email, $str[0]) || strpbrk($special_character_for_email, $str[1])){
+        if(strpbrk($special_character_for_email, $str_email[0]) 
+          || strpbrk($special_character_for_email, $str_email[1])){
 
           $err['e-email'] = $special_character_description;
 
         }
         //Check email format
         else{
-          if(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)){
-
+          if(!$valid_provider){
               $err['e-email'] = "* Invalid email."; 
 
           }
@@ -457,8 +474,23 @@
       }
     }
 
-    $name = $_POST['name'];
-    $surname = $_POST['surname'];
+    $str_name = $_POST['name'];
+
+    $str_name = explode(" ", $str_name);
+    $name = "";
+    $surname = "";
+
+    if(count($str_name) == 3){
+      $name = $str_name[0];
+      $surname = $str_name[1]." ".$str_name[2];
+    }else if(count($str_name) == 2){
+      $name = $str_name[0];
+      $surname = $str_name[1];
+    }else if(count($str_name) == 4){
+      $name = $str_name[0];
+      $surname = $str_name[1]." ".$str_name[2]." ".$str_name[3];
+    }
+
     $n_id = $_POST['code-id'];
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -477,18 +509,35 @@
 
     //If no errors occurred.
     if(!$i){
-      /*
-      $to = $email;
-      $subject = "Test send email";
-      $message = "My Body & My Desctription";
-      $header = "From: wasitthaphon@gmail.com"." \r\n".
-                "Reply-To: wasitthaphon@gmail.com"." \r\n".
-                "X-Mailer: PHP/".phpversion();
-      $flag = @mail($to, $subject, $message, $header);
-      */
-      //Dont forget to set flag!
-      //Check for email was sent.
-      if(1){
+      $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
+      //Server settings
+      //$mail->SMTPDebug = 1;                                 // Enable verbose debug output
+      $mail->isSMTP();                                      // Set mailer to use SMTP
+      $mail->SMTPOptions = array(
+          'ssl' => array(
+              'verify_peer' => false,
+              'verify_peer_name' => false,
+              'allow_self_signed' => true
+          )
+      );
+      $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+      $mail->SMTPAuth = true;                               // Enable SMTP authentication
+      $mail->Username = 'wasitthaphon@gmail.com';                 // SMTP username
+      $mail->Password = 'wasit96beer';                           // SMTP password
+      $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+      $mail->Port = 587;                                    // TCP port to connect to
+
+      //Recipients
+      $mail->setFrom('saharuthi_j@kkumail.com', 'LoveDhamma admin');
+      $mail->addAddress($email);               // Name is optional
+
+      //Content
+      $mail->isHTML(true);                                  // Set email format to HTML
+      $mail->Subject = 'Thank you for registration with LoveDhamma community.';
+      $mail->Body    = '<b>Please wait confirmation from admin.</b>';
+      $mail->AltBody = 'Thank you for register.';
+
+      if($mail->send()){
 
         $file_name = $file_name_new;
         $file_type = $file['type'];
@@ -496,11 +545,6 @@
         $file_content = file_get_contents($file['tmp_name']);
         $file_content = addslashes($file_content);
       
-        /*print_r($file);
-        print_r(realpath(dirname(__FILE__)));
-        print_r($file_destination);
-        */
-
         //Check Upload file is come from file input form
         if(is_uploaded_file($file['tmp_name'])){
 
@@ -515,7 +559,7 @@
           }
 
           //Query command
-          $sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name', '$file_type', '$file_size', '$file_content', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a', '$email', 0, 0)";
+          $sql_str = "INSERT INTO user VALUES (NULL, '$name', '$surname', '$n_id', '$file_name', '$file_type', '$file_size', '$file_content', '$username', '$password', '$birth_date', '$first_q', '$first_a', '$second_q', '$second_a', '$third_q', '$third_a', '$email', 0, 0, 0, 0)";
 
           //Insert to database success
           if($conn->exec($sql_str)){
@@ -549,8 +593,7 @@
   else{
 
     $err = array(
-      "f_name" => "",
-      "l_name" => "",
+      "name" => "",
       "code_id" => "",
       "copy_file" => "",
       "username" => "",
@@ -637,37 +680,20 @@
 
     <form id="register_form" class="font-Tri" method="post" enctype="multipart/form-data">
 
-      <!-- First name -->
+      <!-- Name -->
       <div class="form-group">
         <div class="row">
           <div class="col text-center">
-            <label for="name" style="margin-top: 5px;">First name :</label>
+            <label for="name" style="margin-top: 5px;">Name :</label>
           </div>
           <div class="col-9">
             <input type="text" class="form-control row" name="name" id="name" aria-describedby="name-help" autocomplete="off"  >
             <small id="name-help" class="form-text row" style="color: red;">
               <?php
-                echo $err['f_name'];
+                echo $err['name'];
               ?>
             </small>
           </div>
-        </div>
-      </div>
-
-      <!-- Last name -->
-      <div class="form-group">
-        <div class="row">
-          <div class="col text-center">
-            <label for="surname" style="margin-top: 5px;">Last name :</label>
-          </div>
-          <div class="col-9">
-            <input type="text" class="form-control row" name="surname" id="surname" aria-describedby="surname-help" autocomplete="off">
-           <small id="surname-help" class="form-text row" style="color: red;">
-             <?php
-              echo $err['l_name'];
-             ?>
-           </small>
-         </div>
         </div>
       </div>
 
@@ -775,7 +801,7 @@
       <!-- First question -->
       <div class="form-row form-group">
         <div class="col-6">
-          <label for="first-question">Please select one question</label>
+          <label for="first-question">Please select first question.</label>
           <select class="custom-select" id="first-question" name="first-question">
 
             <!-- insert question here -->
@@ -802,7 +828,7 @@
       <!-- Second question and answer -->
       <div class="form-row form-group">
         <div class="col-6">
-          <label for="second-question">Please select one question</label>
+          <label for="second-question">Please select second question.</label>
           <select class="custom-select" id="second-question" name="second-question">
 
             <!-- insert question here -->
@@ -830,7 +856,7 @@
       <!-- Third question -->
       <div class="form-row form-group">
         <div class="col-6">
-          <label for="third-question">Please select one question</label>
+          <label for="third-question">Please select third question.</label>
           <select class="custom-select" id="third-question" name="third-question">
 
             <!-- insert question here -->
@@ -913,7 +939,10 @@
   <div id="openModal_sign_in" class="sign_in_modalDialog">
     <div>
       <a href="#sign_in_close" title="sign_in_close" class="sign_in_close">X</a>
-      <h2>Login</h2>
+      <h2>Sign in</h2>
+      <div class="text-center">
+        <span id="sign-in-description"></span>
+      </div>
       <div id="text_left" class="sign_in_container">
         <label for="username-sign-in"><b>Username</b></label>
         <input type="text" autocomplete="off" name="username-sign-in" id="username-sign-in">
@@ -923,7 +952,7 @@
         <input type="password" autocomplete="off" name="password-sign-in" id="password-sign-in">
         <span id="password-description"></span>
         <br>
-        <a href="#" id="text_right">Forgot Password</a><br>
+        <a href="#" id="forget_password">Forget Password</a><br>
       </div>
       <body onLoad="ChangeCaptcha()">
       <center><input type="text" id="randomfield" disabled></center>
@@ -940,13 +969,19 @@
             document.getElementById('randomfield').value = ChangeCaptcha;
           }
           function check() {
+            var description = "* Please enter username and password correctly.";
+            var username = $('#username-sign-in').val();
+            var password = $('#password-sign-in').val();
+            var captcha = $('#CaptchaEnter').val();
             if(document.getElementById('CaptchaEnter').value == document.getElementById('randomfield').value ) {
               document.getElementById('sign_in_button_click').click();
             }
             else {
-              $('#captcha-description').text('* Invalid captcha');
-              document.getElementById('captcha-description').style.color = "red";
-              ChangeCaptcha();
+              if(username != '' || password != '' || captcha != ''){
+                $('#sign-in-description').text(description);
+                document.getElementById('sign-in-description').style.color = "red";
+                ChangeCaptcha();
+              }
             }
           }
           </script>
@@ -970,13 +1005,13 @@
   <script>
     $('#username-sign-in').on('click', function(e){
       e.preventDefault();
-      $('#username-description').text('');
+      $('#sign-in-description').text('');
       $('#username-sign-in').val('');
     });
 
     $('#password-sign-in').on('click', function(e){
       e.preventDefault();
-      $('#password-description').text('');
+      $('#sign-in-description').text('');
       $('#password-sign-in').val('');
     });
 
@@ -986,38 +1021,49 @@
       $('#captcha-description').text('');
     });
 
+    $('#forget_password').on('click', function(e){
+      e.preventDefault();
+      var username = $('#username-sign-in').val();
+      var password = $('#password-sign-in').val();
+      var description = "* Please enter username and password correctly.";
+      if(username != ''){
+        $.ajax({
+          url: 'login_check.php',
+          data: {username:username, password:password, data_sending_type:"forget_pwd"},
+          type: 'POST',
+          success: function(value){
+            console.log(value);
+            if(value == 'invalid_password' || value == 'pass'){
+              window.location.href = "Question.php?username=" + username;
+            }else{
+              $('#sign-in-description').text(description);
+              document.getElementById('sign-in-description').style.color = "red";
+              ChangeCaptcha();
+            }
+          }
+        });
+      }
+    });
+
     $('#sign_in_button_click').on('click', function(e){
 
       e.preventDefault();
       var username = $('#username-sign-in').val();
       var password = $('#password-sign-in').val();
+      var description = "* Please enter username and password correctly.";
       
 
       var pattern = /^[a-z A-Z 0-9 \- \_ ก-ฮ ๐-๙ ฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์]+$/;
-      var password_pattern = /^[#$%^&*()+=[\]';,./{}|:<>?~@]+$/;
+      var password_pattern = /^[\#\$\%\^\&\*\(\)\+\=\[\]\'\;\,.\/\{\}\|\:\<\>\?\~\@]+$/;
       if(username == '' || password == ''){
-        if(username == ''){
-          $('#username-description').text('* Please insert username.');
-          document.getElementById('username-description').style.color = "red";
-        }
-
-        if(password == ''){
-          $('#password-description').text('* Please insert password.');
-          document.getElementById('password-description').style.color = "red";
-        }
+        $('#sign-in-description').text(description);
+        document.getElementById('sign-in-description').style.color = "red";
 
         ChangeCaptcha();
 
       }else if(!pattern.test(username) || password_pattern.test(password)){
-        if(!pattern.test(username)){
-          $('#username-description').text('* Special character is not allowed.');
-          document.getElementById('username-description').style.color = "red";
-        }
-
-        if(password_pattern.test(password)){
-          $('#password-description').text('* Special character is not allowed.');
-          document.getElementById('password-description').style.color = "red";
-        }
+        $('#sign-in-description').text(description);
+        document.getElementById('sign-in-description').style.color = "red";
 
         ChangeCaptcha();
 
@@ -1029,14 +1075,14 @@
           success: function(value){
             if(value == 'false'){
 
-              $('#password-description').text('* Invalid username and password.');
-              document.getElementById('password-description').style.color = "red";
+              $('#sign-in-description').text(description);
+              document.getElementById('sign-in-description').style.color = "red";
 
               ChangeCaptcha();
 
             }else if(value == 'invalid_password'){
-              $('#password-description').text('* Invalid username or password.');
-              document.getElementById('password-description').style.color = "red";
+              $('#sign-in-description').text(description);
+              document.getElementById('sign-in-description').style.color = "red";
 
               ChangeCaptcha();
 
