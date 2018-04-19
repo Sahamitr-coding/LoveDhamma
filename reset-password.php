@@ -241,8 +241,8 @@
           $('#reset-password-description').text("* Invalid password format.");
         }else{
           $.ajax({
-            url:'reset-password-check.php',
-            data:{a_password:password ,a_c_password:c_password},
+            url: 'reset-password-check.php',
+            data: {a_password:password ,a_c_password:c_password},
             type: 'POST',
             success: function(value){
               console.log("value :" + value);

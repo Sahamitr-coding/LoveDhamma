@@ -27,14 +27,14 @@
         $sql = "SELECT name,surname,email from user WHERE username = '$username'";
         $user_data = ($conn->query($sql))->fetch();
         
-        $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
+        $mail = new PHPMailer;                            // Passing `true` enables exceptions
         //Server settings
-        //$mail->SMTPDebug = 1;                                 // Enable verbose debug output
+        $mail->SMTPDebug = 3;                            // Enable verbose debug output
         $mail->isSMTP();                                      // Set mailer to use SMTP
         $mail->SMTPOptions = array(
             'ssl' => array(
-                'verify_peer' => false,
-                'verify_peer_name' => false,
+                'verify_peer' => true,
+                'verify_peer_name' => true,
                 'allow_self_signed' => true
             )
         );
@@ -46,13 +46,11 @@
         $mail->Port = 587;                                    // TCP port to connect to
 
         //Recipients
-        $mail->setFrom('saharuthi_j@kkumail.com', 'ชุมชนคนรักธรรมะ');
+        $mail->setFrom('wasitthaphon@hotmail.com', 'ชุมชนคนรักธรรมะ');
         $mail->addAddress($user_data['email']);               // Name is optional
-
-        //Content
-        $mail->isHTML(true);                                  // Set email format to HTML
+        $mail->CharSet = 'UTF-8';
         $mail->Subject = 'Your password has been reset.';
-        $mail->Body    = '<b>Your password has been reset lately.</b>';
+        $mail->msgHTML('Your password has been reset lately.');
         $mail->AltBody = 'password has been reset.';
 
         if(!$mail->send()){
@@ -60,6 +58,11 @@
         }else{
 
           $sql = "UPDATE user SET password='$newpassword' WHERE username='$username'";
+          $conn->exec($sql);
+          $sql = "SELECT * FROM user WHERE username='$username'";
+          $user_data = ($conn->query($sql))->fetch();
+          $id = $user_data['id'];
+          $sql = "INSERT INTO notification VALUES(NULL, 2, $id, 0)";
           $conn->exec($sql);
           echo 'passed';
         }

@@ -1,0 +1,23 @@
+.text1{
+    text-align: center;
+    color: black;
+}
+/* unvisited link */
+.aManage:link {
+    color: black;
+}
+
+/* visited link */
+.aManage:visited {
+    color: darkblue;
+}
+
+/* mouse over link */
+.aManage:hover {
+    color: crimson;
+}
+
+/* selected link */
+.aManage:active {
+    color: blue;
+}

@@ -16,7 +16,11 @@
 		$_SESSION['user_data'] = $get_user;
 		$sql = "UPDATE user SET sign_in_count=0 WHERE username='$username'";
 		$conn->exec($sql);
-		echo "pass";
+		if($get_user['permission'] == 0){
+			echo "pass";
+		}else if($get_user['permission'] == 1){
+			echo "pass_admin";
+		}
 
 
 	}else if($get_username){

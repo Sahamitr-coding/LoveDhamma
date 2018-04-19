@@ -208,134 +208,49 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="offnymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="offnymous"></script>
   <script src='https://www.google.com/recaptcha/api.js'></script>
+  <script src='js/alternative_function.js'></script>
   <script>
-
-    $('#answer1').on('click', function(){
-      $('#question-description').text('');
-      $('#answer1').val('');
-    });
-
-    $('#answer2').on('click', function(){
-      $('#question-description').text('');
-      $('#answer2').val('');
-    });
-
-    $('#answer3').on('click', function(){
-      $('#question-description').text('');
-      $('#answer3').val('');
-    });
-
     $('#questionSubmit').on('click', function(e){
       e.preventDefault();
       var description = "* Please enter answer correctly.";
       var answer_1 = $('#answer1').val();
       var answer_2 = $('#answer2').val();
       var answer_3 = $('#answer3').val();
+      var username = "<?php echo $username; ?>";
       var answer_1_from_db = "<?php echo $data_result['answer_1']; ?>";
       var answer_2_from_db = "<?php echo $data_result['answer_2']; ?>";
       var answer_3_from_db = "<?php echo $data_result['answer_3']; ?>";
       
       if(answer_1 == answer_1_from_db && answer_2 == answer_2_from_db
         && answer_3 == answer_3_from_db){
-        window.location.href = 'reset-password.php';
+        $.ajax({
+          url: 'reset_sign_in_count.php',
+          data: {username:username},
+          type: 'POST',
+          success: function(value){
+            window.location.href = 'reset-password.php';
+          }
+        });
       }else{
-        $('#question-description').text(description);
         document.getElementById('question-description').style.color = "red";
-      }
-    });
-
-
-    $('#username-sign-in').on('click', function(e){
-      e.preventDefault();
-      $('#sign-in-description').text('');
-      $('#username-sign-in').val('');
-    });
-
-    $('#password-sign-in').on('click', function(e){
-      e.preventDefault();
-      $('#sign-in-description').text('');
-      $('#password-sign-in').val('');
-    });
-
-    $('#CaptchaEnter').on('click', function(e){
-      e.preventDefault();
-      $('#CaptchaEnter').val('');
-      $('#captcha-description').text('');
-    });
-
-    $('#forget_password').on('click', function(e){
-      e.preventDefault();
-      var username = $('#username-sign-in').val();
-      var password = $('#password-sign-in').val();
-      var description = "* Please enter username and password correctly.";
-      if(username != ''){
         $.ajax({
-          url: 'login_check.php',
-          data: {username:username, password:password, data_sending_type:"forget_pwd"},
+          url: 'increase_count_of_answer_fault.php',
+          data: {username:username},
           type: 'POST',
           success: function(value){
-            console.log(value);
-            if(value == 'invalid_password' || value == 'pass'){
-              window.location.href = "Question.php?username=" + username;
-            }else{
-              $('#sign-in-description').text(description);
-              document.getElementById('sign-in-description').style.color = "red";
-              ChangeCaptcha();
+            if(value == 'locked'){
+              $('#question-description').text("your username has been locked.");
+            }else if(value == 'count_fault'){
+              $('#question-description').text(description);  
+            }else if(value == 'go_index'){
+              window.location.href = 'index.php';
+            }else if(value.includes('Found exception')){
+              $('#question-description').text(value);
             }
           }
         });
       }
     });
-
-    $('#sign_in_button_click').on('click', function(e){
-
-      e.preventDefault();
-      var username = $('#username-sign-in').val();
-      var password = $('#password-sign-in').val();
-      var description = "* Please enter username and password correctly.";
-      
-
-      var pattern = /^[a-z A-Z 0-9 \- \_ ก-ฮ ๐-๙ ฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์]+$/;
-      var password_pattern = /^[\#\$\%\^\&\*\(\)\+\=\[\]\'\;\,.\/\{\}\|\:\<\>\?\~\@]+$/;
-      if(username == '' || password == ''){
-        $('#sign-in-description').text(description);
-        document.getElementById('sign-in-description').style.color = "red";
-
-        ChangeCaptcha();
-
-      }else if(!pattern.test(username) || password_pattern.test(password)){
-        $('#sign-in-description').text(description);
-        document.getElementById('sign-in-description').style.color = "red";
-
-        ChangeCaptcha();
-
-      }else{
-        $.ajax({
-          url: 'login_check.php',
-          data: {username:username, password:password, data_sending_type:"sign_in"},
-          type: 'POST',
-          success: function(value){
-            if(value == 'false'){
-
-              $('#sign-in-description').text(description);
-              document.getElementById('sign-in-description').style.color = "red";
-
-              ChangeCaptcha();
-
-            }else if(value == 'invalid_password'){
-              $('#sign-in-description').text(description);
-              document.getElementById('sign-in-description').style.color = "red";
-
-              ChangeCaptcha();
-
-            }else if(value == 'pass'){
-              window.location.href = "index.php";
-            }
-          }
-        });
-      }
-    });
-
   </script>
 </body>
 </html>

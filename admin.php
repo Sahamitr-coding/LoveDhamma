@@ -1,3 +1,20 @@
+<?php 
+  require 'connect.php';
+  session_start();
+
+  if(isset($_SESSION['user_data'])){
+    if($_SESSION['user_data']['permission']){
+      $sql_statement = "SELECT * FROM notification WHERE status=0";
+      $notification_item = ($conn->query($sql_statement))->fetchAll();
+    }else{
+      header("Location: index.php");
+    }
+  }else{
+    header("Location: index.php");
+  }
+
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -45,15 +62,19 @@
       <div class="width">
           <ul>
               <li class="dropdown">
-                  <button class="dropbtn2"><a href="index.php">Home</a></button>
-                  <div class="dropdown-content">
-                      <a href="#">News and Announcement</a>
-                  </div>
-
+                  <?php 
+                    if(isset($_SESSION['user_data'])){
+                      if($_SESSION['user_data']['permission']){
+                        $str = "admin.php";
+                      }else{
+                        $str = "index.php";
+                      }
+                    }
+                  ?>
+                  <button class="dropbtn2"><a href="<?php echo $str;?>">Home</a></button>
               </li>
-              <li><a class="dropbtn2" href="#">Knowledge sources</a></li>
-              <li><a class="dropbtn2" href="#">Events</a></li>
-              <li><a class="dropbtn2" href="#">About us</a></li>
+              <li><a class="dropbtn2" href="manage_user.php">Manage User</a></li>
+              
           </ul>
           <div class="clear"></div>
         <div class="clear"></div>
@@ -61,18 +82,33 @@
     </nav> 
     <!-- end แก้ไข -->
 
+    <!-- Notification -->
     <div class="container">
       <div class="row text-center">
             <div class="col-sm-12 col-sm-offset-3">
-            <br><br> <h1 style="color:#0fad00">Successful</h1>
-            <img src="Img/Check.png" width="150" height="150">
-            
-            <p style="font-size:20px;color:#5C5C5C;">Thank you for your registration.<br> 
-            Please verify your email and wait for approval adminstrator.</p>
-      
-        <br><br>
+              <br>
+              <h1 style="color:#0fad00">NOTIFICATION</h1><hr>
+                <?php
+                  foreach ($notification_item as $item) {
+
+                    $id = $item['from_item_id'];
+                    if($item['from_code'] == 1){
+                      $sql = "SELECT name, surname FROM user WHERE id='$id'";
+                      $result_data = ($conn->query($sql))->fetch();
+                      $str = "<h6 class=\"row text_left\">&nbsp;&nbsp;&nbsp;&nbsp".$result_data['name']." ".$result_data['surname']." just registered.</h6>";
+                      
+                    }else if($item['from_code'] == 2){
+                      $sql = "SELECT name, surname FROM user WHERE id='$id'";
+                      $result_data = ($conn->query($sql))->fetch();
+                      $str = "<h6 class=\"row text_left\">&nbsp;&nbsp;&nbsp;&nbsp".$result_data['name']." ".$result_data['surname']." just reset password.</h6>";
+                      
+                    }else{
+                      $str = "<h6 class=\"row text_left\">&nbsp;&nbsp;&nbsp;&nbsp NOT IN ANY CASES.</h6>";
+                    }
+                    echo $str;
+                  }
+                ?>
             </div>
-            
       </div>
     </div>
 
@@ -135,7 +171,7 @@
       </div>
     </div>
 
-    <footer id="footer" class="text-center" style="margin-top: 3rem;">
+    <footer id="footer" class="text-center">
     <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน ธ.นำธรรมดี </span> </div>
     <div class="font-color1"> saharuthi_j@kkumail.com </div>
   </footer>
