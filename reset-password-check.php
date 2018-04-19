@@ -38,15 +38,15 @@
                 'allow_self_signed' => true
             )
         );
-        $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+        $mail->Host = 'smtp-mail.outlook.com';  // Specify main and backup SMTP servers
         $mail->SMTPAuth = true;                               // Enable SMTP authentication
-        $mail->Username = 'wasitthaphon@gmail.com';                 // SMTP username
-        $mail->Password = 'wasit96beer';                           // SMTP password
+        $mail->Username = 'wasitthaphon@hotmail.com';                 // SMTP username
+        $mail->Password = 'beer2539';                           // SMTP password
         $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
         $mail->Port = 587;                                    // TCP port to connect to
 
         //Recipients
-        $mail->setFrom('saharuthi_j@kkumail.com', 'LoveDhamma admin');
+        $mail->setFrom('saharuthi_j@kkumail.com', 'ชุมชนคนรักธรรมะ');
         $mail->addAddress($user_data['email']);               // Name is optional
 
         //Content
