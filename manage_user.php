@@ -3,8 +3,10 @@
   session_start();
 
   if(isset($_SESSION['user_data'])){
-    $sql_stmt = "SELECT * FROM user";
-    $user_data = ($conn->query($sql_stmt))->fetchAll(); 
+    $sql_stmt = "SELECT * FROM user ORDER BY id DESC";
+    $user_data = ($conn->query($sql_stmt))->fetchAll();
+    $sql_stmt_member = "SELECT * FROM user ORDER BY name,surname DESC";
+    $user_data_mb = ($conn->query($sql_stmt_member))->fetchAll();
   }else{
     header("Location: index.php");
   }
@@ -34,7 +36,22 @@
 <header class="header_Bg">
 			<div class="navbar-header width">
         <img class="img left" src="img/Logo1.png" alt="Logo1">
+        <spen class="right">
+           <?php 
+              if(isset($_SESSION['user_data'])){
+                $html_username_tag = "<div><a class=\"btn-link\" href=\"profile.php\">สวัสดีคุณ ".$_SESSION['user_data']['username']."</a></div>";
+                $html_sign_out = "<div><a class=\"btn-link\" href=\"index.php?sign_out\">Sign out</a></div>";
 
+                echo $html_username_tag.$html_sign_out;
+
+              }else{
+                $html_sign_in = "<div><a class=\"btn-link\" href=\"#openModal_sign_in\">Sign in</a></div>";
+                $html_register = "<div><a class=\"btn-link\" href=\"register.php\">Register</a></div>";
+
+                echo $html_sign_in.$html_register;
+              }
+            ?>
+        </spen>
 			</div>
 				
 		</header>
@@ -72,7 +89,8 @@
             <div class="alert alert-warning " role="alert">
                 <h1 class="text1">Member user</h1>
                  <?php
-                  foreach ($user_data as $item) {
+                  sort($user_data);
+                  foreach ($user_data_mb as $item) {
                     if($item['admin_confirm']){
                       $str = "<div><a class=\"aManage\" href=\"#\">".$item['name']." ".$item['surname']."</a></div>";
                       echo $str;

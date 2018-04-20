@@ -21,3 +21,14 @@
 .aManage:active {
     color: blue;
 }
+
+.body_w {
+    display: block;
+    min-height: 100%; /* real browsers */
+    height: auto !important; /* real browsers */
+    height: 100%; /* IE6 bug */
+}
+
+.for_admin{
+    margin-top: 50%;
+}

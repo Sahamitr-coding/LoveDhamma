@@ -563,7 +563,9 @@
 
           //Insert to database success
           if($conn->exec($sql_str)){
-
+            $last_id = $conn->insert_id;
+            $sql_statement = "INSERT INTO notification VALUES(NULL, 1, $lastname, 0)";
+            $conn->exec($sql_statement);
             header("Location: Successful.php");
 
           }

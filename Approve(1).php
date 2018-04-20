@@ -16,7 +16,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Profile</title>
+  <title>ชุมชน คนชอบปฏิบัติธรรม</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link href="css/main.css" rel="stylesheet">
@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="css/styles.css" type="text/css" />
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
   <link href="css/carousel.css" rel="stylesheet" type="text/css" >
+  <link href="css/CSS_Reset.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Maitree|Trirong" rel="stylesheet">
   <link href="css/Approve-button.css" rel="stylesheet">
 </head>
@@ -34,58 +35,37 @@
 
   <main role="main">
    <!-- แก้ไข -->
-<header class="header_Bg">
-      <div class="navbar-header width">
+<header class="header_Bg body_reset">
+			<div class="navbar-header width">
         <img class="img left" src="img/Logo1.png" alt="Logo1">
         <spen class="right">
-            <?php 
-                if(isset($_SESSION['user_data'])){
-                  $html_username_tag = "<div><a id=\"open_username\" class=\"btn-link\" href=\"profile.php\">สวัสดีคุณ ".$_SESSION['user_data']['username']."</a></div>";
-                  $html_sign_out = "<div><a id=\"sign_out\" class=\"btn-link\" href=\"index.php?sign_out\">Sign out</a></div>";
-
-                  echo $html_username_tag.$html_sign_out;
-
-                }else{
-                  $html_sign_in = "<div><a id=\"open_the_modal\" class=\"btn-link\" href=\"#openModal_sign_in\">Sign in</a></div>";
-                  $html_register = "<div><a id=\"go_to_register_page\" class=\"btn-link\" href=\"register.php\">Register</a></div>";
-
-                  echo $html_sign_in.$html_register;
-                }
-              ?>
+            <div><a class="btn-link" href="#">Sign In</a></div>
+            <div><a class="btn-link" href="register.php">Register</a></div>
         </spen>
-      </div>
-        
-    </header>
+			</div>
+				
+		</header>
 
      <nav id="mainnav">
       <div class="width">
           <ul>
-              <li class="dropdown">
-                  <?php 
-                    if(isset($_SESSION['user_data'])){
-                      if($_SESSION['user_data']['permission']){
-                        $str = "admin.php";
-                      }else{
-                        $str = "index.php";
-                      }
-                    }
-                  ?>
-                  <button class="dropbtn2"><a href="<?php echo $str;?>">Home</a></button>
-              </li>
-              <li><a class="dropbtn2" href="manage_user.php">Manage User</a></li>
-              
+    
+              <li><a class="dropbtn2" href="#">Knowledge sources</a></li>
+              <li><a class="dropbtn2" href="#">Events</a></li>
+              <li><a class="dropbtn2" href="#">About us</a></li>
           </ul>
           <div class="clear"></div>
         <div class="clear"></div>
       </div>
     </nav> 
     <!-- end แก้ไข -->
-
-      <div class="register_container" style="margin-bottom: 3rem;">
-        <h3 style="text-align: center; margin-top: 2rem;">Profile</h3><hr>
-        <form id="register_form" class="font-Tri" method="post" enctype="multipart/form-data">
-
-          <form role="form"> 
+   <div style="text-align: center;">
+       
+       
+       
+       
+       <!--ข้อมูล-->
+      <form id="profile_user" > 
                 <?php
                     $row = $user_data;
                     if(!isset($row)){
@@ -115,44 +95,40 @@
                     $LengthA1 = strlen($row['answer_1']);
                     $LengthA2 = strlen($row['answer_2']);
                     $LengthA3 = strlen($row['answer_3']);
-                    echo '<table>';
-                    echo "<tr><td>ชื่อ-นามสกุล : </td><td>".$row['name']."  ".$row['surname']."</td></tr>";
-                    echo "<tr><td>เลขประจำตัวประชาชน : </td><td>".$row['national_id']."</td></tr>";
-                    echo "<tr><td>Password : </td><td>".$showPassword."</td></tr>";
-                    echo "<tr><td>Question 1 : </td><td>".$question[$row['question_1_id']-1]."</td></tr>";
-                    echo "<tr><td>Answer 1 : </td><td>".str_repeat("x", $LengthA1)."</td></td>";
-                    echo "<tr><td>Question 2 : </td><td>".$question[$row['question_2_id']-1]."</td></tr>";
-                    echo "<tr><td>Answer 2 : </td><td>".str_repeat("x", $LengthA2)."</td></tr>";
-                    echo "<tr><td>Question 3 : </td><td>".$question[$row['question_3_id']-1]."</td></tr>";
-                    echo "<tr><td>Answer 3 : </td><td>".str_repeat("x", $LengthA3)."</td></tr>";
-                   
-                    echo "</table><br>";
-                    echo '<div class="text-center">';
-                  if($row['file_content'] != 0){
-                   echo '<img src="data:image/jpeg;base64,'.base64_encode($row['file_content']).'" width="500" height="900" />';
-                  }else{
-                    echo '<img src="uploads/'.$row['file_name'].'" width="500" height="900" />';
-                  }     
-                    echo '</div>';
-                ?>
-        </form>
-          </form>
-    </div>
+            
+                    echo "<table>";
+                    echo "<tr><td>ชื่อ-นามสกุล : </td><td>".$row['name']."  ".$row['surname']."</tr>";
+                    echo "<tr><td>เลขประจำตัวประชาชน : </td><td>".substr_replace($row['national_id'], $ShowSSN,2)."</tr>";
+                    echo "<tr><td>Password : </td><td>".$showPassword;
+                    echo "<tr><td>Question 1 : </td><td>".$question[$row['question_1_id']-1]."</tr>";
+                    echo "<tr><td>Answer 1 : </td><td>".str_repeat("x", $LengthA1);
+                    echo "<tr><td>Question 2 : </td><td>".$question[$row['question_2_id']-1]."</tr>";
+                    echo "<tr><td>Answer 2 : </td><td>".str_repeat("x", $LengthA2);
+                    echo "<tr><td>Question 3 : </td><td>".$question[$row['question_3_id']-1]."</tr>";
+                    echo "<tr><td>Answer 3 : </td><td>".str_repeat("x", $LengthA3);
+                    
 
-  <div class="text-center" style="margin-bottom: 3rem;">
+                    echo "</table><br>";
+                    
+                ?>
+        </form> 
+    </div>
+ <br>
+    
+  <div class="text-center">
     <button id="approve" class="button">Approve</button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="disapprove" class="button button3">Disapprove</button>
   </div>
+      
+      
 
-
-    <footer id="footer" class="text-center fixed">
-     <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน คนชอบปฏิบัติธรรม</span> </div>
-     <div class="font-color1"> saharuthi_j@kkumail.com </div>
+    <footer id="footer" class="text-center">
+     <div class="font-color1"> Copyright &copy; <span class="font-s1">ชุมชน คนชอบปฏิบัติธรรม </span> </div>
+     <div class="font-color1"> saharuthi_j@kkumail.com </div>       
     </footer>
     <!-- Script -->
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
     <script>
       var id = "<?php echo $id; ?>";
       $('#approve').on('click', function(e){
