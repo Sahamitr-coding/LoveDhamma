@@ -107,17 +107,18 @@
                     $LengthA3 = strlen($row['answer_3']);
             
                     echo "<table>";
-                    echo "<tr><td>ชื่อ-นามสกุล : </td><td>".$row['name']."  ".$row['surname']."</tr>";
-                    echo "<tr><td>เลขประจำตัวประชาชน : </td><td>".substr_replace($row['national_id'], $ShowSSN,2)."</tr>";
-                    echo "<tr><td>Password : </td><td>".$showPassword."<button type='button' class='btn btn-outline-warning' style='margin-left: 10px;'>Change Password</button></tr><br>";
-                    echo "<tr><td>Question 1 : </td><td>".$question[$row['question_1_id']-1]."</tr>";
-                    echo "<tr><td>Answer 1 : </td><td>".str_repeat("x", $LengthA1)."<button type='button' class='btn btn-outline-warning' style='margin-left: 10px;'>Edit</button></tr>";
-                    echo "<tr><td>Question 2 : </td><td>".$question[$row['question_2_id']-1]."</tr>";
-                    echo "<tr><td>Answer 2 : </td><td>".str_repeat("x", $LengthA2)."<button type='button' class='btn btn-outline-warning' style='margin-left: 10px;'>Edit</button></tr>";
+                    echo "<tr><td>ชื่อ-นามสกุล : </td><td>".$row['name']."  ".$row['surname']."</td></tr>";
+                    echo "<tr><td>เลขประจำตัวประชาชน : </td><td>".substr_replace($row['national_id'], $ShowSSN,2)."</td></tr>";
+                    echo '<tr><td>Username : </td><td>'.$row['username'].'</td></tr>';
+                    echo "<tr><td>Password : </td><td>".$showPassword."</td></tr>";
+                    echo '<tr><td>Birth date : </td><td>'.date("d-m-Y", strtotime($row['birthday'])).'</td></tr>';
+                    echo "<tr><td>Question 1 : </td><td>".$question[$row['question_1_id']-1]."</td></tr>";
+                    echo "<tr><td>Answer 1 : </td><td>".str_repeat("x", $LengthA1)."</td></tr>";
+                    echo "<tr><td>Question 2 : </td><td>".$question[$row['question_2_id']-1]."</td></tr>";
+                    echo "<tr><td>Answer 2 : </td><td>".str_repeat("x", $LengthA2)."</td></tr>";
                     echo "<tr><td>Question 3 : </td><td>".$question[$row['question_3_id']-1]."</tr>";
-                    echo "<tr><td>Answer 3 : </td><td>".str_repeat("x", $LengthA3)."<button type='button' class='btn btn-outline-warning' style='margin-left: 10px;'>Edit</button></tr>";
+                    echo "<tr><td>Answer 3 : </td><td>".str_repeat("x", $LengthA3)."</td></tr>";
                     
-
                     echo "</table><br>";
                     
                 ?>

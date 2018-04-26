@@ -115,20 +115,23 @@
                     $LengthA1 = strlen($row['answer_1']);
                     $LengthA2 = strlen($row['answer_2']);
                     $LengthA3 = strlen($row['answer_3']);
-                    echo '<table>';
+                    echo "<table>";
                     echo "<tr><td>ชื่อ-นามสกุล : </td><td>".$row['name']."  ".$row['surname']."</td></tr>";
+                    //echo "<tr><td>เลขประจำตัวประชาชน : </td><td>".substr_replace($row['national_id'], $ShowSSN,2)."</td></tr>";
                     echo "<tr><td>เลขประจำตัวประชาชน : </td><td>".$row['national_id']."</td></tr>";
+                    echo '<tr><td>Username : </td><td>'.$row['username'].'</td></tr>';
                     echo "<tr><td>Password : </td><td>".$showPassword."</td></tr>";
+                    echo '<tr><td>Birth date : </td><td>'.date("d-m-Y", strtotime($row['birthday'])).'</td></tr>';
                     echo "<tr><td>Question 1 : </td><td>".$question[$row['question_1_id']-1]."</td></tr>";
-                    echo "<tr><td>Answer 1 : </td><td>".str_repeat("x", $LengthA1)."</td></td>";
+                    echo "<tr><td>Answer 1 : </td><td>".str_repeat("x", $LengthA1)."</td></tr>";
                     echo "<tr><td>Question 2 : </td><td>".$question[$row['question_2_id']-1]."</td></tr>";
                     echo "<tr><td>Answer 2 : </td><td>".str_repeat("x", $LengthA2)."</td></tr>";
-                    echo "<tr><td>Question 3 : </td><td>".$question[$row['question_3_id']-1]."</td></tr>";
+                    echo "<tr><td>Question 3 : </td><td>".$question[$row['question_3_id']-1]."</tr>";
                     echo "<tr><td>Answer 3 : </td><td>".str_repeat("x", $LengthA3)."</td></tr>";
                    
                     echo "</table><br>";
                     echo '<div class="text-center">';
-                  if($row['file_content'] != 0){
+                  if(!empty($row['file_content'])){
                    echo '<img src="data:image/jpeg;base64,'.base64_encode($row['file_content']).'" width="500" height="900" />';
                   }else{
                     echo '<img src="uploads/'.$row['file_name'].'" width="500" height="900" />';

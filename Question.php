@@ -207,7 +207,6 @@
   <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="offnymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="offnymous"></script>
-  <script src='https://www.google.com/recaptcha/api.js'></script>
   <script src='js/alternative_function.js'></script>
   <script>
     $('#questionSubmit').on('click', function(e){
@@ -228,6 +227,7 @@
           data: {username:username},
           type: 'POST',
           success: function(value){
+            console.log("Value : " + value);
             window.location.href = 'reset-password.php';
           }
         });
@@ -239,7 +239,7 @@
           type: 'POST',
           success: function(value){
             if(value == 'locked'){
-              $('#question-description').text("your username has been locked.");
+              $('#question-description').text("your username has locked. Please contact admin.");
             }else if(value == 'count_fault'){
               $('#question-description').text(description);  
             }else if(value == 'go_index'){

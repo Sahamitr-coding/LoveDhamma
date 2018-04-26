@@ -28,10 +28,12 @@
     $special_char_space_fault = "* Special character and space is not allowed.";
     $special_character_description = "* Special character is not allowed.";
     $blank_description = "* Please insert information.";
+  
+    $username_character = '/^[a-z A-Z 0-9 \- \_ ก-ฮ ๐-๙ ฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์์]+$/';
 
-    $digit = '/([0-9]|[๐๑๒๓๔๕๖๗๘๙]{3})+/';  
-    $username_character = '/^[a-z A-Z 0-9 \- \_ ก-ฮ ๐-๙ ฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์]+$/';
-
+    $name_character = '/^[a-zA-Zก-ฮฯะัาำิีึืุูเแโใไๅๆ็่้๊๋์์]+$/';
+    $thai_alphabet = "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮะัาํิ'ฤฦ่้๊๋์ุูเโใไ็";
+    $english_alpabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     $small_alphabet = '/[a-z]+/';
     $capital_alphabet = '/[A-Z]+/';
     $numeric = '/[0-9]+/';
@@ -40,7 +42,7 @@
     $special_character_except_space = "#$%^&*()+=[]';,./{}|:<>?~@";
     $special_character_for_email = "#$%^&*()+=[]';,/{}|:<>?~";
     $special_character_underscore_dash_except_space = "#$%^&*()+=[]';,./{}|:<>?~@-_";
-
+    $thai_digit = "๐๑๒๓๔๕๖๗๘๙";
     //Check firstname and lastname in database.
     if(isset($_POST['name'])){
       $sql_name = $_POST['name'];
@@ -77,13 +79,56 @@
             $str_name_check = $_POST['name'];
             $str_name_check = explode(" ", $str_name_check);
 
-            if(preg_match($digit, $_POST['name']) || count($str_name_check) > 4 || count($str_name_check) == 1){
-              $err['name'] = "* Invalid input format.";
+            //Special char
+            $has_special_char = 0;
+            for($i = 0; $i < mb_strlen($special_character_underscore_dash_except_space); $i++){
+              $char = mb_substr($special_character_underscore_dash_except_space, $i, 1);
+              if(mb_strpos($_POST['name'], $char)){
+                $has_special_char = 1;
+                break;
+              }
+            }
+            //Thai number
+            $has_thai_digit = 0;
+            for($i = 0; $i < mb_strlen($thai_digit); $i++){
+              $char = mb_substr($thai_digit, $i, 1);
+              if(mb_strpos($_POST['name'], $char)){
+                $has_thai_digit = 1;
+                break;
+              }
+            }
 
-            }//Not numeric but special char
-            else if(strpbrk($_POST['name'] , $special_character_underscore_dash_except_space)){ 
-              $err['name'] = $special_char_space_fault;
-              
+            //Thai alphabet
+            $has_thai_alphabet = 0;
+            for($i = 0; $i < mb_strlen($thai_alphabet); $i++){
+              $char = mb_substr($thai_alphabet, $i, 1);
+              if(mb_strpos($_POST['name'], $char)){
+                $has_thai_alphabet = 1;
+                break;
+              }
+            }
+
+            //English alphabet
+            $has_english_alphabet = 0;
+            for($i = 0; $i < mb_strlen($english_alpabet); $i++){
+              $char = mb_substr($english_alpabet, $i, 1);
+              if(mb_strpos($_POST['name'], $char)){
+                $has_english_alphabet = 1;
+                break;
+              }
+            }
+
+            //Blank check
+            $has_blank = 0;
+            if(mb_strpos($_POST['name'], "  ")){
+              $has_blank = 1;
+            }
+
+            if($has_special_char){
+              $err['name'] = $special_character_description;
+            }else if($has_thai_digit || preg_match($numeric, $_POST['name']) || ($has_thai_alphabet && $has_english_alphabet) || $has_blank){
+
+              $err['name'] = "* Invalid input format.";
             }//True
             else{
               $err['name'] = "";
@@ -509,33 +554,42 @@
 
     //If no errors occurred.
     if(!$i){
-      $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
-      //Server settings
-      //$mail->SMTPDebug = 1;                                 // Enable verbose debug output
-      $mail->isSMTP();                                      // Set mailer to use SMTP
+      $mail = new PHPMailer;
+      //Tell PHPMailer to use SMTP
+      $mail->isSMTP();
+      //Enable SMTP debugging
+      // 0 = off (for production use)
+      // 1 = client messages
+      // 2 = client and server messages
+      //$mail->SMTPDebug = 3;
+      //Set the hostname of the mail server
+      $mail->Host = 'smtp-mail.outlook.com';
+      //Set the SMTP port number - likely to be 25, 465 or 587
+      $mail->Port = 587;
+      //Whether to use SMTP authentication
+      $mail->SMTPAuth = true;
+      $mail->SMTPSecure = 'tls';  
       $mail->SMTPOptions = array(
           'ssl' => array(
-              'verify_peer' => false,
-              'verify_peer_name' => false,
+              'verify_peer' => true,
+              'verify_peer_name' => true,
               'allow_self_signed' => true
           )
       );
-      $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
-      $mail->SMTPAuth = true;                               // Enable SMTP authentication
-      $mail->Username = 'wasitthaphon@gmail.com';                 // SMTP username
-      $mail->Password = 'wasit96beer';                           // SMTP password
-      $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-      $mail->Port = 587;                                    // TCP port to connect to
-
-      //Recipients
-      $mail->setFrom('saharuthi_j@kkumail.com', 'LoveDhamma admin');
-      $mail->addAddress($email);               // Name is optional
-
-      //Content
-      $mail->isHTML(true);                                  // Set email format to HTML
-      $mail->Subject = 'Thank you for registration with LoveDhamma community.';
-      $mail->Body    = '<b>Please wait confirmation from admin.</b>';
-      $mail->AltBody = 'Thank you for register.';
+      //Username to use for SMTP authentication
+      $mail->Username = 'wasitthaphon@hotmail.com';
+      //Password to use for SMTP authentication
+      $mail->Password = 'beer2539';
+      //Set who the message is to be sent from
+      $mail->CharSet = 'UTF-8';
+      $mail->setFrom('wasitthaphon@hotmail.com', 'ชุมชนคนรักธรรมะ');
+      $mail->addAddress($email, $username);               // Name is optional
+        $mail->Subject = 'Thank you for registration with LoveDhamma';
+        //Read an HTML message body from an external file, convert referenced images to embedded,
+        //convert HTML into a basic plain-text alternative body
+        $mail->msgHTML("Thank you for registration with LoveDhamma.");
+        //Replace the plain text body with one created manually
+        $mail->AltBody = 'Thank you for registration with LoveDhamma.';
 
       if($mail->send()){
 
@@ -563,8 +617,8 @@
 
           //Insert to database success
           if($conn->exec($sql_str)){
-            $last_id = $conn->insert_id;
-            $sql_statement = "INSERT INTO notification VALUES(NULL, 1, $lastname, 0)";
+            $last_id = $conn->lastInsertId();
+            $sql_statement = "INSERT INTO notification VALUES(NULL, 1, $last_id, 0)";
             $conn->exec($sql_statement);
             header("Location: Successful.php");
 

@@ -4,7 +4,7 @@
 
   if(isset($_SESSION['user_data'])){
     if($_SESSION['user_data']['permission']){
-      $sql_statement = "SELECT * FROM notification WHERE status=0";
+      $sql_statement = "SELECT * FROM notification WHERE status=0 ORDER BY id DESC";
       $notification_item = ($conn->query($sql_statement))->fetchAll();
     }else{
       header("Location: index.php");
@@ -91,12 +91,12 @@
                   foreach ($notification_item as $item) {
 
                     $id = $item['from_item_id'];
-                    if($item['from_code'] == 1){
+                    if($item['from_code'] == 1 && !$item['status']){
                       $sql = "SELECT name, surname FROM user WHERE id='$id'";
                       $result_data = ($conn->query($sql))->fetch();
-                      $str = "<h6 class=\"row text_left\">&nbsp;&nbsp;&nbsp;&nbsp".$result_data['name']." ".$result_data['surname']." just registered.</h6>";
+                      $str = "<a href=\"manage_user.php\"><h6 class=\"row text_left\">&nbsp;&nbsp;&nbsp;&nbsp".$result_data['name']." ".$result_data['surname']." just registered.</h6></a>";
                       
-                    }else if($item['from_code'] == 2){
+                    }else if($item['from_code'] == 2 && !$item['status']){
                       $sql = "SELECT name, surname FROM user WHERE id='$id'";
                       $result_data = ($conn->query($sql))->fetch();
                       $str = "<h6 class=\"row text_left\">&nbsp;&nbsp;&nbsp;&nbsp".$result_data['name']." ".$result_data['surname']." just reset password.</h6>";

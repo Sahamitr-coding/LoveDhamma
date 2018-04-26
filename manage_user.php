@@ -59,8 +59,8 @@
      <nav id="mainnav">
       <div class="width">
           <ul>
-            <li><a class="dropbtn2" href="admin.php">Home</a></li>
-            <li><a class="dropbtn" href="manage_user.php">Manage User</a></li>
+            <li><a id="admin_home" class="dropbtn2" href="admin.php">Home</a></li>
+            <li><a id="manage_user" class="dropbtn" href="manage_user.php">Manage User</a></li>
     
           </ul>
           <div class="clear"></div>
@@ -76,8 +76,7 @@
                   foreach ($user_data as $item) {
                     if(!$item['admin_confirm']){
                       $id = $item['id'];
-                      $str = "<div><a class=\"aManage\" href=\"Approve.php?id=".$id."\">".$item['name']." ".$item['surname']."</a></div>";
-
+                      $str = '<div><a id="'.$item['id'].'" class="aManage" href="Approve.php?id='.$id.'">'.$item['name']." ".$item['surname']."</a></div>";
                       echo $str;
                     }
                   }
@@ -91,8 +90,9 @@
                  <?php
                   sort($user_data);
                   foreach ($user_data_mb as $item) {
+                    $id = $item['id'];
                     if($item['admin_confirm']){
-                      $str = "<div><a class=\"aManage\" href=\"#\">".$item['name']." ".$item['surname']."</a></div>";
+                      $str = '<div><a id="'.$item['id'].'" class="aManage" href="Approve.php?id='.$id.'">'.$item['name']." ".$item['surname']."</a></div>";
                       echo $str;
                     }
                   }

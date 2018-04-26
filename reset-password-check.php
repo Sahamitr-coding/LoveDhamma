@@ -27,10 +27,21 @@
         $sql = "SELECT name,surname,email from user WHERE username = '$username'";
         $user_data = ($conn->query($sql))->fetch();
         
-        $mail = new PHPMailer;                            // Passing `true` enables exceptions
-        //Server settings
-        $mail->SMTPDebug = 3;                            // Enable verbose debug output
-        $mail->isSMTP();                                      // Set mailer to use SMTP
+        $mail = new PHPMailer;
+        //Tell PHPMailer to use SMTP
+        $mail->isSMTP();
+        //Enable SMTP debugging
+        // 0 = off (for production use)
+        // 1 = client messages
+        // 2 = client and server messages
+        $mail->SMTPDebug = 3;
+        //Set the hostname of the mail server
+        $mail->Host = 'smtp-mail.outlook.com';
+        //Set the SMTP port number - likely to be 25, 465 or 587
+        $mail->Port = 587;
+        //Whether to use SMTP authentication
+        $mail->SMTPAuth = true;
+        $mail->SMTPSecure = 'tls';  
         $mail->SMTPOptions = array(
             'ssl' => array(
                 'verify_peer' => true,
@@ -38,20 +49,21 @@
                 'allow_self_signed' => true
             )
         );
-        $mail->Host = 'smtp-mail.outlook.com';  // Specify main and backup SMTP servers
-        $mail->SMTPAuth = true;                               // Enable SMTP authentication
-        $mail->Username = 'wasitthaphon@hotmail.com';                 // SMTP username
-        $mail->Password = 'beer2539';                           // SMTP password
-        $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-        $mail->Port = 587;                                    // TCP port to connect to
-
-        //Recipients
-        $mail->setFrom('wasitthaphon@hotmail.com', 'ชุมชนคนรักธรรมะ');
-        $mail->addAddress($user_data['email']);               // Name is optional
+        //Username to use for SMTP authentication
+        $mail->Username = 'wasitthaphon@hotmail.com';
+        //Password to use for SMTP authentication
+        $mail->Password = 'beer2539';
+        //Set who the message is to be sent from
         $mail->CharSet = 'UTF-8';
+        $mail->setFrom('wasitthaphon@hotmail.com', 'ชุมชนคนรักธรรมะ');
+        //Set an alternative reply-to address
+        $mail->addAddress($user_data['email'], $user_data['username']);               // Name is optional
         $mail->Subject = 'Your password has been reset.';
-        $mail->msgHTML('Your password has been reset lately.');
-        $mail->AltBody = 'password has been reset.';
+        //Read an HTML message body from an external file, convert referenced images to embedded,
+        //convert HTML into a basic plain-text alternative body
+        $mail->msgHTML("Your password has been reset.");
+        //Replace the plain text body with one created manually
+        $mail->AltBody = 'Your password has been reset.';
 
         if(!$mail->send()){
           echo 'Email can not be sent.';

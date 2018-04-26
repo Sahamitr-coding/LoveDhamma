@@ -206,7 +206,7 @@
           type: 'POST',
           success: function(value){
             console.log(value);
-            if(value == 'invalid_password' || value == 'pass'){
+            if(value.includes('invalid_password') || value.includes('pass')){
               window.location.href = "Question.php?username=" + username;
             }else{
               $('#sign-in-description').text(description);

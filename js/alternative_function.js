@@ -68,8 +68,12 @@ $('#forget_password').on('click', function(e){
       type: 'POST',
       success: function(value){
         console.log(value);
-        if(value == 'invalid_password' || value == 'pass'){
+        if(value == 'forget_password_pass'){
           window.location.href = "Question.php?username=" + username;
+        }else if(value == 'locked'){
+          $('#sign-in-description').text("Your username has locked. Please contact admin.");
+          document.getElementById('sign-in-description').style.color = "red";
+          ChangeCaptcha();
         }else{
           $('#sign-in-description').text(description);
           document.getElementById('sign-in-description').style.color = "red";
